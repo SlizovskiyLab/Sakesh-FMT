@@ -6,11 +6,15 @@ import matplotlib.ticker as ticker
 file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_dataset.csv"
 df = pd.read_csv(file_path)
 
+# Replace values for clarity
+df['donor_pre_post'] = df['donor_pre_post'].replace({'Pre-FMT': 'PreFMT', 'Post-FMT': 'PostFMT'})
+
 # Define the sequencing depth using the number of bases in gigabases
+# Filter out rows with missing values in these columns
 df_filtered = df.dropna(subset=["number_bases_gigabases", "donor_pre_post"])
 
 # Filter only preFMT and postFMT samples
-df_filtered = df[df["donor_pre_post"].isin(["preFMT", "postFMT"])]
+df_filtered = df_filtered[df_filtered["donor_pre_post"].isin(["PreFMT", "PostFMT"])]
 
 # Convert timepoint (days) to numeric
 df_filtered["timepoint"] = pd.to_numeric(df_filtered["timepoint"], errors="coerce")
@@ -22,7 +26,7 @@ df_filtered = df_filtered.sort_values("timepoint")
 plt.figure(figsize=(10, 6))
 
 # Define colors for each group
-colors = {"preFMT": "blue", "postFMT": "red"}
+colors = {"PreFMT": "blue", "PostFMT": "red"}
 
 # Plot scatter points
 for condition, color in colors.items():
@@ -48,6 +52,7 @@ plt.xlim(0, 400)
 plt.ylim(0, 35)   
 plt.xticks(range(0, 401, 50))  
 plt.yticks(range(0, 36, 5))
+
 # Customize plot
 plt.xlabel("Days Until Collection (timepoint)")
 plt.ylabel("Sequencing Depth (Gigabases)")
