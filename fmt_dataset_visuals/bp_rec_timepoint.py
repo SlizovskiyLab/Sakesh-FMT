@@ -1,64 +1,52 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.ticker as ticker
+import seaborn as sns
+import numpy as np
+import statsmodels.api as sm
 
 # Load the dataset
 file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_dataset.csv"
 df = pd.read_csv(file_path)
 
-# Replace values for clarity
-df['donor_pre_post'] = df['donor_pre_post'].replace({'Pre-FMT': 'PreFMT', 'Post-FMT': 'PostFMT'})
+# Filter out PreFMT samples
+df_filtered = df[df["donor_pre_post"] != "PreFMT"].copy()
 
-# Define the sequencing depth using the number of bases in gigabases
-# Filter out rows with missing values in these columns
-df_filtered = df.dropna(subset=["number_bases_gigabases", "donor_pre_post"])
+# Ensure Post-FMT is labeled consistently
+df_filtered["donor_pre_post"] = df_filtered["donor_pre_post"].replace({"Post-FMT": "PostFMT"})
 
-# Filter only preFMT and postFMT samples
-df_filtered = df_filtered[df_filtered["donor_pre_post"].isin(["PreFMT", "PostFMT"])]
+# Remove data points above 200 days and at 0 days
+df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoint"] <= 200)]
 
-# Convert timepoint (days) to numeric
-df_filtered["timepoint"] = pd.to_numeric(df_filtered["timepoint"], errors="coerce")
+# Convert sequencing depth to log scale
+df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["number_bases_gigabases"])
 
-# Sort values by time for better visualization
-df_filtered = df_filtered.sort_values("timepoint")
+# Initialize a wider figure
+plt.figure(figsize=(16, 6))
 
-# Initialize plot
-plt.figure(figsize=(10, 6))
+# Scatter plot using seaborn scatterplot
+sns.scatterplot(x="timepoint", y="number_bases_gigabases", hue="Disease_type", data=df_filtered, alpha=0.6)
 
-# Define colors for each group
-colors = {"PreFMT": "blue", "PostFMT": "red"}
+# Fit LOESS curve for smoothing
+unique_diseases = df_filtered["Disease_type"].unique()
+colors = sns.color_palette("tab10", len(unique_diseases))
 
-# Plot scatter points
-for condition, color in colors.items():
-    subset = df_filtered[df_filtered["donor_pre_post"] == condition]
-    plt.scatter(subset["timepoint"], subset["number_bases_gigabases"], 
-                color=color, alpha=0.7, label=f"{condition} Samples")
-
-# Approximate LOESS manually using a rolling average
-window_size = 5  # Adjust for smoothness
-for condition, color in colors.items():
-    subset = df_filtered[df_filtered["donor_pre_post"] == condition].copy()  # Avoid warnings
-    subset["Smoothed"] = subset["number_bases_gigabases"].rolling(window=window_size, center=True).mean()
+for disease, color in zip(unique_diseases, colors):
+    subset = df_filtered[df_filtered["Disease_type"] == disease]
+    subset = subset.dropna(subset=["timepoint", "number_bases_gigabases"])
     
-    # Plot LOESS approximation
-    plt.plot(subset["timepoint"], subset["Smoothed"], color=color, linewidth=2, linestyle="-", 
-             label=f"{condition} LOESS Approx.")
+    if not subset.empty:
+        x_sorted = np.sort(subset["timepoint"])
+        y_sorted = subset["number_bases_gigabases"].iloc[np.argsort(subset["timepoint"])]
+        lowess_result = sm.nonparametric.lowess(y_sorted, x_sorted, frac=0.5)  # Increased smoothing
+        plt.plot(lowess_result[:, 0], lowess_result[:, 1], color=color, linewidth=2, label=f"{disease} LOESS")
 
-# Customize x-axis ticks
-plt.xticks(rotation=45)  # Rotate for readability
-plt.gca().xaxis.set_major_locator(ticker.MaxNLocator(nbins=10))  # Ensure enough ticks
-
-plt.xlim(0, 400)  
-plt.ylim(0, 35)   
-plt.xticks(range(0, 401, 50))  
-plt.yticks(range(0, 36, 5))
-
-# Customize plot
-plt.xlabel("Days Until Collection (timepoint)")
-plt.ylabel("Sequencing Depth (Gigabases)")
-plt.title("Sequencing Depth Over Time for preFMT and postFMT Samples")
+# Customize x-axis for better spacing
+plt.xticks(rotation=45, ha="right")
+plt.xlabel("Timepoint (Days)")
+plt.ylabel("Log10 Sequencing Depth (Gigabases)")
+plt.title("Log Sequencing Depth Over Time by Disease Type")
 plt.legend()
 plt.grid(alpha=0.3)
 
-# Show plot
+# Show the updated plot
 plt.show()
