@@ -18,13 +18,13 @@ df_filtered["donor_pre_post"] = df_filtered["donor_pre_post"].replace({"Post-FMT
 df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoint"] <= 200)]
 
 # Convert sequencing depth to log scale
-# df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["number_bases_gigabases"])
+df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["number_bases_gigabases"])
 
 # Initialize a wider figure
 plt.figure(figsize=(16, 6))
 
 # Scatter plot using seaborn scatterplot
-sns.scatterplot(x="timepoint", y="number_bases_gigabases", hue="Disease_type", data=df_filtered, alpha=0.6)
+sns.scatterplot(x="timepoint", y="log_number_bases_gigabases", hue="Disease_type", data=df_filtered, alpha=0.6)
 
 # Fit LOESS curve for smoothing
 unique_diseases = df_filtered["Disease_type"].unique()
@@ -32,11 +32,11 @@ colors = sns.color_palette("tab10", len(unique_diseases))
 
 for disease, color in zip(unique_diseases, colors):
     subset = df_filtered[df_filtered["Disease_type"] == disease]
-    subset = subset.dropna(subset=["timepoint", "number_bases_gigabases"])
+    subset = subset.dropna(subset=["timepoint", "log_number_bases_gigabases"])
     
     if not subset.empty:
         x_sorted = np.sort(subset["timepoint"])
-        y_sorted = subset["number_bases_gigabases"].iloc[np.argsort(subset["timepoint"])]
+        y_sorted = subset["log_number_bases_gigabases"].iloc[np.argsort(subset["timepoint"])]
         lowess_result = sm.nonparametric.lowess(y_sorted, x_sorted, frac=0.5)  # Increased smoothing
         plt.plot(lowess_result[:, 0], lowess_result[:, 1], color=color, linewidth=2, label=f"{disease} LOESS")
 
