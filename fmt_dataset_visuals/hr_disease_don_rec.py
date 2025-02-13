@@ -24,7 +24,8 @@ df_filtered["host_removal_input_reads_millions"] = df_filtered["host_removal_inp
 
 # Step 4: Plot the violin plot
 plt.figure(figsize=(12, 6))
-sns.violinplot(x="X_Label", y="host_removal_input_reads_millions", data=df_filtered, palette="muted", inner=None)
+sns.violinplot(x="X_Label", y="host_removal_input_reads_millions", data=df_filtered, palette="muted", inner=None, cut = 0)
+sns.boxplot(x="X_Label", y = "host_removal_input_reads_millions", data=df_filtered, color = "gray", width=0.2)
 sns.stripplot(x="X_Label", y="host_removal_input_reads_millions", data=df_filtered, color="black", alpha=0.6, jitter=True)
 
 # Enhance plot readability
