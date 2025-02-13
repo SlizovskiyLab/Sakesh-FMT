@@ -30,6 +30,13 @@ combined_df = pd.DataFrame({"ID": mge_sums.index, "MGE": mge_sums.values, "AMR":
 fmt_df = fmt_df.set_index(fmt_df.columns[0])
 merged_df = fmt_df.merge(combined_df, left_index=True, right_on="ID")
 
+# **Sort by number_bases_gigabases and assign percentile bins**
+merged_df = merged_df.sort_values("number_bases_gigabases").reset_index()
+merged_df["size_bin"] = pd.qcut(merged_df.index, 10, labels=False)  # 10 equal bins
+
+# **Scale sizes for better visualization**
+merged_df["size"] = (merged_df["size_bin"] + 1) * 20  # Smallest 20, largest 200
+
 # Initialize the figure
 fig, ax = plt.subplots(figsize=(14, 8))  # Increased figure size
 
@@ -41,6 +48,7 @@ marker_styles = {"PreFMT": "o", "PostFMT": "s", "Donor": "^"}  # Different shape
 for (study, donor_status), subset in merged_df.groupby(["study_data", "donor_pre_post"]):
     ax.scatter(
         subset["AMR"], subset["MGE"],
+        s=subset["size"],  # Set sizes based on percentile bins
         label=f"{study}, {donor_status}",
         color=palette[list(merged_df["study_data"].unique()).index(study)],
         marker=marker_styles.get(donor_status, "o"), alpha=0.7
@@ -49,10 +57,14 @@ for (study, donor_status), subset in merged_df.groupby(["study_data", "donor_pre
 # Labels and title
 ax.set_xlabel("AMR (Summed)")
 ax.set_ylabel("MGE (Summed)")
-ax.set_title("MGE vs. AMR by Study Data and Donor Status")
+ax.set_title("MGE vs. AMR by Study Data and Donor Status (Sized by Percentile Bins)")
+
+# Adjust legend
 plt.subplots_adjust(left=0.1, right=0.75) 
 ax.legend(title="Study & Donor Status", bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small', frameon=True)
+
+# Grid for better readability
 ax.grid(alpha=0.3)
+
+# Show the updated plot
 plt.show()
-
-
