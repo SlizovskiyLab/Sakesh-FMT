@@ -30,12 +30,12 @@ combined_df = pd.DataFrame({"ID": mge_sums.index, "MGE": mge_sums.values, "AMR":
 fmt_df = fmt_df.set_index(fmt_df.columns[0])
 merged_df = fmt_df.merge(combined_df, left_index=True, right_on="ID")
 
-# **Sort by number_bases_gigabases and assign percentile bins**
+# Sort by number_bases_gigabases and assign percentile bins
 merged_df = merged_df.sort_values("number_bases_gigabases").reset_index()
 merged_df["size_bin"] = pd.qcut(merged_df.index, 10, labels=False)  # 10 equal bins
 
-# **Scale sizes for better visualization**
-merged_df["size"] = (merged_df["size_bin"] + 1) * 20  # Smallest 20, largest 200
+# Scale sizes for better visualization
+merged_df["size"] = (merged_df["size_bin"] + 1) * 10 
 
 # Initialize the figure
 fig, ax = plt.subplots(figsize=(14, 8))  # Increased figure size
