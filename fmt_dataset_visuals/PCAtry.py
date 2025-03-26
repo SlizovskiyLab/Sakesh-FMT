@@ -20,74 +20,68 @@ amr_matrix = pd.read_csv(amr_matrix_path)
 annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
-# Step 1: Remove rows where 'gene_accession' contains "RequiresSNPConfirmation"
+# removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
 
-# Step 2: Merge with megares annotations to categorize resistance genes
+# merging with megares annotations to categorize resistance genes
 amr_merged = amr_matrix_filtered.merge(annotations[['header', 'group']], left_on='gene_accession', right_on='header', how='left').drop(columns=['header'])
 
-# Step 3: Sum values across genes for each ID, preserving individual resistance features
+# summing values across genes for each ID, preserving individual resistance features
 resistance_features = amr_merged.drop(columns=['gene_accession', 'group']).groupby(amr_merged['group']).sum().T
 resistance_features.reset_index(inplace=True)
 resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 
-# Step 4: Merge with study labels from FMT_dataset
+# merging with study labels from FMT_dataset
 merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'study_data']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
-# Step 5: Apply Bayesian Missing Data Imputation
+# applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'study_data']))
 
-# Step 6: Apply CLR transformation using scikit-bio with zero replacement
+# applying CLR transformation using scikit-bio with zero replacement
 pseudocount = 1e-6
 clr_input = imputed_data
-clr_input[clr_input <= 0] = pseudocount  # Ensure all values are positive
+clr_input[clr_input <= 0] = pseudocount 
 
-try:
-    clr_transformed = clr(clr_input)
-    if np.any(np.isnan(clr_transformed)) or np.any(np.isinf(clr_transformed)):
-        raise ValueError("CLR transformation produced NaN or infinite values.")
-except Exception as e:
-    print("Error in CLR transformation:", e)
-    clr_transformed = np.nan_to_num(clr_input)  # Fallback to raw data if CLR fails
+clr_transformed = clr(clr_input)
+if np.any(np.isnan(clr_transformed)) or np.any(np.isinf(clr_transformed)):
+    raise ValueError("CLR transformation produced NaN or infinite values.")
 
-# Handle NaN and infinite values
-clr_transformed[np.isinf(clr_transformed)] = 0  # Replace infinite values with zero
-clr_transformed = np.nan_to_num(clr_transformed)  # Replace NaNs with zero
+# handling NaN and infinite values
+clr_transformed[np.isinf(clr_transformed)] = 0
+clr_transformed = np.nan_to_num(clr_transformed)
 
-# Step 7: Compute Aitchison distances
+# computing Aitchison distances
 aitchison_distances = squareform(pdist(clr_transformed, metric='euclidean'))
 
-# Step 8: Perform PCA
+# performing PCA
 pca = PCA(n_components=2)
 pca_result = pca.fit_transform(aitchison_distances)
 merged_df['PC1'] = pca_result[:, 0]
 merged_df['PC2'] = pca_result[:, 1]
 
-# Ensure no NaN values in 'study_data' (Fix for chained assignment warning)
+# ensuring no NaN values in 'study_data' (Fix for chained assignment warning)
 merged_df['study_data'] = merged_df['study_data'].fillna('Unknown')
 
-# Create scatter plot and extract color mapping from Seaborn
+# creating scatter plot and extract color mapping from Seaborn
 plt.figure(figsize=(10, 6))
 ax = sns.scatterplot(x='PC1', y='PC2', hue='study_data', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
 
-# Extract colors properly from scatterplot (Fix for AttributeError)
+# extracting colors properly from scatterplot (Fix for AttributeError)
 unique_studies = merged_df['study_data'].unique()
-facecolors = ax.collections[0].get_facecolors()  # Extract color values
+facecolors = ax.collections[0].get_facecolors()
 study_colors = {study: facecolors[i] for i, study in enumerate(unique_studies)}
 
-# Compute confidence intervals and add matching colored bubbles
+# computing confidence intervals and add matching colored bubbles
 for study in unique_studies:
     subset = merged_df[merged_df['study_data'] == study]
-    if len(subset) < 2:  # Prevent sem() error with small sample sizes
+    if len(subset) < 2:
         continue
 
     mean_x, mean_y = subset['PC1'].mean(), subset['PC2'].mean()
-    ci_x, ci_y = sem(subset['PC1']) * 1.96, sem(subset['PC2']) * 1.96  # 95% CI
-    color = study_colors.get(study, 'gray')  # Extract exact color from scatterplot
-    
-    # Add correctly colored bubble
+    ci_x, ci_y = sem(subset['PC1']) * 1.96, sem(subset['PC2']) * 1.96 
+    color = study_colors.get(study, 'gray') 
     circle = plt.Circle((mean_x, mean_y), max(ci_x, ci_y), color=color, alpha=0.2)
     plt.gca().add_patch(circle)
 
