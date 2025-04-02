@@ -116,7 +116,7 @@ for group in unique_groups:
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Mobilome Samples (Donor Status)')
-plt.legend(title='Donor Status', bbox_to_anchor=(1, 1))
+plt.title('PCA of Aitchison Distances for Mobilome Samples (Donor/Recipient)')
+plt.legend(title='Donor/Recipient Status', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
