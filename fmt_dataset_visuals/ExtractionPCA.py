@@ -7,6 +7,8 @@ from scipy.spatial.distance import pdist, squareform
 from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import sem
+from scipy.stats import chi2
+from matplotlib.patches import Ellipse
 
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"

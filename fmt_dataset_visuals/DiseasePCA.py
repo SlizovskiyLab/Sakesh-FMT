@@ -93,14 +93,13 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
     )
     ax.add_patch(ellipse)
 
-# creating scatter plot and extracting color mapping from Seaborn
+# creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
-ax = sns.scatterplot(x='PC1', y='PC2', hue='Disease_type', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
-
-# extracting colors properly from scatterplot
 unique_diseases = merged_df['Disease_type'].unique()
-facecolors = ax.collections[0].get_facecolors()
-disease_colors = {disease: facecolors[i] for i, disease in enumerate(unique_diseases)}
+palette = sns.color_palette('tab10', len(unique_diseases))
+disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+
+ax = sns.scatterplot(x='PC1', y='PC2', hue='Disease_type', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # computing confidence ellipses
 for disease in unique_diseases:

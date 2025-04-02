@@ -64,20 +64,21 @@ merged_df['PC2'] = pca_result[:, 1]
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):
     if len(x) < 2:
-        return 
+        return  # Skip groups with insufficient points
 
     mean_x, mean_y = np.mean(x), np.mean(y)
     cov = np.cov(x, y)  # Compute covariance matrix
 
     # Eigen decomposition to get ellipse parameters
     eigvals, eigvecs = np.linalg.eigh(cov)
-    order = np.argsort(eigvals)[::-1]
+    order = np.argsort(eigvals)[::-1]  # Sort eigenvalues (largest first)
     eigvals, eigvecs = eigvals[order], eigvecs[:, order]
 
     # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
-    chi2_val = np.sqrt(chi2.ppf(0.95, df=2)) 
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
     width, height = 2 * chi2_val * np.sqrt(eigvals)
-    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1])) 
+
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
 
     ellipse = Ellipse(
         xy=(mean_x, mean_y),
@@ -90,14 +91,13 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
     )
     ax.add_patch(ellipse)
 
-# creating scatter plot and extracting color mapping from Seaborn
+# creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
-ax = sns.scatterplot(x='PC1', y='PC2', hue='sequencer', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
-
-# extracting colors properly from scatterplot
 unique_diseases = merged_df['sequencer'].unique()
-facecolors = ax.collections[0].get_facecolors()
-disease_colors = {disease: facecolors[i] for i, disease in enumerate(unique_diseases)}
+palette = sns.color_palette('tab10', len(unique_diseases))
+disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+
+ax = sns.scatterplot(x='PC1', y='PC2', hue='sequencer', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # computing confidence ellipses
 for disease in unique_diseases:
