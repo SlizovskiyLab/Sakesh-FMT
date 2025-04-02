@@ -65,29 +65,52 @@ pca_result = pca.fit_transform(aitchison_distances)
 merged_df['PC1'] = pca_result[:, 0]
 merged_df['PC2'] = pca_result[:, 1]
 
-# Creating scatter plot
+# Function to compute and draw 95% confidence ellipses
+def confidence_ellipse(x, y, ax, color, n_std=1.96):
+    if len(x) < 2:
+        return  # Skip groups with insufficient points
+
+    mean_x, mean_y = np.mean(x), np.mean(y)
+    cov = np.cov(x, y)  # Compute covariance matrix
+
+    # Eigen decomposition to get ellipse parameters
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    order = np.argsort(eigvals)[::-1]  # Sort eigenvalues (largest first)
+    eigvals, eigvecs = eigvals[order], eigvecs[:, order]
+
+    # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
+    width, height = 2 * chi2_val * np.sqrt(eigvals)
+
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
+
+    ellipse = Ellipse(
+        xy=(mean_x, mean_y),
+        width=width,
+        height=height,
+        angle=angle,
+        edgecolor=color,
+        facecolor=color,
+        alpha=0.2
+    )
+    ax.add_patch(ellipse)
+
+# creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
-ax = sns.scatterplot(x='PC1', y='PC2', hue='DNA_extraction_kit', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
+unique_diseases = merged_df['DNA_extraction_kit'].unique()
+palette = sns.color_palette('tab10', len(unique_diseases))
+disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
 
-# Extract colors properly from the scatterplot
-handles, labels = ax.get_legend_handles_labels()
-legend_colors = {label: handle.get_color() for label, handle in zip(labels, handles)}
+ax = sns.scatterplot(x='PC1', y='PC2', hue='DNA_extraction_kit', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
-# Computing confidence intervals and adding correctly colored bubbles
-for kit in merged_df['DNA_extraction_kit'].unique():
-    subset = merged_df[merged_df['DNA_extraction_kit'] == kit]
-    if len(subset) < 2:
-        continue
-    
-    mean_x, mean_y = subset['PC1'].mean(), subset['PC2'].mean()
-    ci_x, ci_y = sem(subset['PC1']) * 1.96, sem(subset['PC2']) * 1.96 
-    color = legend_colors.get(kit, 'gray') 
-    circle = plt.Circle((mean_x, mean_y), max(ci_x, ci_y), color=color, alpha=0.2)
-    plt.gca().add_patch(circle)
+# computing confidence ellipses
+for disease in unique_diseases:
+    subset = merged_df[merged_df['DNA_extraction_kit'] == disease]
+    confidence_ellipse(subset['PC1'], subset['PC2'], ax, disease_colors.get(disease, 'gray'))
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Resistome Samples (DNA Extraction Kit-based)')
-plt.legend(title='DNA Extraction Kit', bbox_to_anchor=(1, 1))
+plt.title('PCA of Aitchison Distances for Resistome Samples (DNA extraction kit)')
+plt.legend(title='DNA extraction kit', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
