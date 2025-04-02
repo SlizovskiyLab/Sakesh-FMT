@@ -6,7 +6,8 @@ from sklearn.decomposition import PCA
 from scipy.spatial.distance import pdist, squareform
 from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
-from scipy.stats import sem
+from scipy.stats import chi2
+from matplotlib.patches import Ellipse
 
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"
@@ -62,7 +63,37 @@ merged_df['PC2'] = pca_result[:, 1]
 # ensuring no NaN values in 'Disease_type'
 merged_df['Disease_type'] = merged_df['Disease_type'].fillna('Unknown')
 
-# creating scatter plot and extract color mapping from Seaborn
+# Function to compute and draw 95% confidence ellipses
+def confidence_ellipse(x, y, ax, color, n_std=1.96):
+    if len(x) < 2:
+        return  # Skip groups with insufficient points
+
+    mean_x, mean_y = np.mean(x), np.mean(y)
+    cov = np.cov(x, y)  # Compute covariance matrix
+
+    # Eigen decomposition to get ellipse parameters
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    order = np.argsort(eigvals)[::-1]  # Sort eigenvalues (largest first)
+    eigvals, eigvecs = eigvals[order], eigvecs[:, order]
+
+    # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
+    width, height = 2 * chi2_val * np.sqrt(eigvals)
+
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
+
+    ellipse = Ellipse(
+        xy=(mean_x, mean_y),
+        width=width,
+        height=height,
+        angle=angle,
+        edgecolor=color,
+        facecolor=color,
+        alpha=0.2
+    )
+    ax.add_patch(ellipse)
+
+# creating scatter plot and extracting color mapping from Seaborn
 plt.figure(figsize=(10, 6))
 ax = sns.scatterplot(x='PC1', y='PC2', hue='Disease_type', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
 
@@ -71,17 +102,10 @@ unique_diseases = merged_df['Disease_type'].unique()
 facecolors = ax.collections[0].get_facecolors()
 disease_colors = {disease: facecolors[i] for i, disease in enumerate(unique_diseases)}
 
-# computing confidence intervals and add matching colored bubbles
+# computing confidence ellipses
 for disease in unique_diseases:
     subset = merged_df[merged_df['Disease_type'] == disease]
-    if len(subset) < 2:
-        continue
-
-    mean_x, mean_y = subset['PC1'].mean(), subset['PC2'].mean()
-    ci_x, ci_y = sem(subset['PC1']) * 1.96, sem(subset['PC2']) * 1.96 
-    color = disease_colors.get(disease, 'gray') 
-    circle = plt.Circle((mean_x, mean_y), max(ci_x, ci_y), color=color, alpha=0.2)
-    plt.gca().add_patch(circle)
+    confidence_ellipse(subset['PC1'], subset['PC2'], ax, disease_colors.get(disease, 'gray'))
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
