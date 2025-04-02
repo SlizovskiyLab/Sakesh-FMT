@@ -7,6 +7,8 @@ from scipy.spatial.distance import pdist, squareform
 from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import sem
+from scipy.stats import chi2
+from matplotlib.patches import Ellipse
 
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"
@@ -78,28 +80,52 @@ pca_result = pca.fit_transform(aitchison_distances)
 merged_df['PC1'] = pca_result[:, 0]
 merged_df['PC2'] = pca_result[:, 1]
 
-# Creating scatter plot
+# Function to compute and draw 95% confidence ellipses
+def confidence_ellipse(x, y, ax, color, n_std=1.96):
+    if len(x) < 2:
+        return 
+
+    mean_x, mean_y = np.mean(x), np.mean(y)
+    cov = np.cov(x, y)  # Compute covariance matrix
+
+    # Eigen decomposition to get ellipse parameters
+    eigvals, eigvecs = np.linalg.eigh(cov)
+    order = np.argsort(eigvals)[::-1]
+    eigvals, eigvecs = eigvals[order], eigvecs[:, order]
+
+    # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2)) 
+    width, height = 2 * chi2_val * np.sqrt(eigvals)
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1])) 
+
+    ellipse = Ellipse(
+        xy=(mean_x, mean_y),
+        width=width,
+        height=height,
+        angle=angle,
+        edgecolor=color,
+        facecolor=color,
+        alpha=0.2
+    )
+    ax.add_patch(ellipse)
+
+# creating scatter plot and extracting color mapping from Seaborn
 plt.figure(figsize=(10, 6))
 ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_df, palette='tab10', alpha=0.7, edgecolor='k')
 
-# Extracting unique categories for coloring
-handles, labels = ax.get_legend_handles_labels()
-category_colors = {label: handle.get_color() for label, handle in zip(labels, handles)}
+# extracting colors properly from scatterplot
+unique_diseases = merged_df['donor_pre_post'].unique()
+facecolors = ax.collections[0].get_facecolors()
+disease_colors = {disease: facecolors[i] for i, disease in enumerate(unique_diseases)}
 
-# Adding confidence ellipses
-for category in merged_df['donor_pre_post'].unique():
-    subset = merged_df[merged_df['donor_pre_post'] == category]
-    if len(subset) < 2:
-        continue
-    mean_x, mean_y = subset['PC1'].mean(), subset['PC2'].mean()
-    ci_x, ci_y = sem(subset['PC1']) * 1.96, sem(subset['PC2']) * 1.96
-    color = category_colors.get(category, 'gray')
-    circle = plt.Circle((mean_x, mean_y), max(ci_x, ci_y), color=color, alpha=0.2)
-    plt.gca().add_patch(circle)
+# computing confidence ellipses
+for disease in unique_diseases:
+    subset = merged_df[merged_df['donor_pre_post'] == disease]
+    confidence_ellipse(subset['PC1'], subset['PC2'], ax, disease_colors.get(disease, 'gray'))
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Resistome Samples (Donor Pre/Post)')
-plt.legend(title='Donor Pre/Post', bbox_to_anchor=(1, 1))
+plt.title('PCA of Aitchison Distances for Resistome Samples (Donot/PreFMT/PostFMT)')
+plt.legend(title='Donors & Recipients', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
