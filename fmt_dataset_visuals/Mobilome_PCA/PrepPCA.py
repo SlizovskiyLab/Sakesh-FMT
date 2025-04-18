@@ -8,6 +8,7 @@ from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
+from skbio.stats.distance import DistanceMatrix, permanova
 
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
@@ -118,3 +119,13 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (FMT Preparation)')
 plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+
+print(merged_mobilome_df['ID'].duplicated().any())
+# PERMANOVA 
+
+sample_ids = merged_mobilome_df['ID'].values
+distance_matrix = DistanceMatrix(aitchison_distances, ids=sample_ids)
+grouping = merged_mobilome_df['fmt_prep'].values
+result = permanova(distance_matrix, grouping=grouping, permutations=999)
+print(result)

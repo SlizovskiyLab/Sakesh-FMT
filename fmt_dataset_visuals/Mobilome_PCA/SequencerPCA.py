@@ -83,7 +83,7 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
     eigvals, eigvecs = eigvals[order], eigvecs[:, order]
 
     # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
-    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2)) 
     width, height = 2 * chi2_val * np.sqrt(eigvals)
 
     angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
