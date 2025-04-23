@@ -148,7 +148,7 @@ for group1, group2 in combinations(unique_groups, 2):
     dm = DistanceMatrix(subset_dist_matrix, ids=subset_ids)
 
     # Run PERMANOVA
-    result = permanova(dm, grouping=subset_grouping, permutations=999)
+    result = permanova(dm, grouping=subset_grouping, permutations=999, seed=42)
     pairwise_results.append((f"{group1} vs {group2}", result['p-value']))
 
 # FDR correction
