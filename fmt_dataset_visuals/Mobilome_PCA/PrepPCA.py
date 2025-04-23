@@ -9,6 +9,8 @@ from sklearn.impute import KNNImputer
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
 from skbio.stats.distance import DistanceMatrix, permanova
+from itertools import combinations
+from statsmodels.stats.multitest import multipletests
 
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
@@ -19,6 +21,15 @@ fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full
 mge_matrix = pd.read_csv(mge_matrix_path)
 mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
+
+# Remove blank/missing entries from 'fmt_prep'
+fmt_dataset = fmt_dataset.dropna(subset=['fmt_prep'])
+fmt_dataset = fmt_dataset[fmt_dataset['fmt_prep'].str.strip() != '']
+
+# Filter MGE matrix columns to include only IDs present in fmt_dataset
+valid_ids = set(fmt_dataset['run_accession'])
+columns_to_keep = ['gene_accession'] + [col for col in mge_matrix.columns if col in valid_ids]
+mge_matrix = mge_matrix[columns_to_keep]
 
 # Renaming column for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})
@@ -70,6 +81,7 @@ merged_mobilome_df['PC2'] = pca_result[:, 1]
 # Ensuring no NaN values in 'fmt_prep'
 merged_mobilome_df['fmt_prep'] = merged_mobilome_df['fmt_prep'].fillna('Unknown')
 
+
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):
     if len(x) < 2:
@@ -120,12 +132,31 @@ plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
 
+#PERMANOVA
 
-print(merged_mobilome_df['ID'].duplicated().any())
-# PERMANOVA 
+pairwise_results = []
+unique_groups = merged_mobilome_df['fmt_prep'].dropna().unique()
 
-sample_ids = merged_mobilome_df['ID'].values
-distance_matrix = DistanceMatrix(aitchison_distances, ids=sample_ids)
-grouping = merged_mobilome_df['fmt_prep'].values
-result = permanova(distance_matrix, grouping=grouping, permutations=999)
-print(result)
+for group1, group2 in combinations(unique_groups, 2):
+    subset_df = merged_mobilome_df[merged_mobilome_df['fmt_prep'].isin([group1, group2])]
+    subset_ids = subset_df['ID'].values
+    subset_grouping = subset_df['fmt_prep'].values
+
+    # Get corresponding rows in the CLR-transformed matrix
+    subset_indices = merged_mobilome_df.index[merged_mobilome_df['fmt_prep'].isin([group1, group2])]
+    subset_dist_matrix = squareform(pdist(clr_transformed[subset_indices, :], metric='euclidean'))
+    dm = DistanceMatrix(subset_dist_matrix, ids=subset_ids)
+
+    # Run PERMANOVA
+    result = permanova(dm, grouping=subset_grouping, permutations=999)
+    pairwise_results.append((f"{group1} vs {group2}", result['p-value']))
+
+# FDR correction
+labels, raw_pvals = zip(*pairwise_results)
+fdr_corrected = multipletests(raw_pvals, method='fdr_bh')[1]
+
+# Print results
+print("\nPairwise PERMANOVA with FDR Correction (Benjamini-Hochberg):")
+print("{:<30} {:<15} {:<15}".format("Comparison", "Raw p-value", "FDR-adjusted p"))
+for label, raw, fdr in zip(labels, raw_pvals, fdr_corrected):
+    print("{:<30} {:<15.4f} {:<15.4f}".format(label, raw, fdr))
