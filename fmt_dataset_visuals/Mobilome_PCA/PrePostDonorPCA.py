@@ -19,10 +19,16 @@ mge_matrix = pd.read_csv(mge_matrix_path)
 mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
-# Data Cleaning
-fmt_dataset = fmt_dataset.iloc[:-5]  # Remove last five rows
-fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({'Post-FMT': 'PostFMT', 'Pre-FMT': 'PreFMT'})
+fmt_dataset = fmt_dataset.iloc[:-5]
+
+# Standardize values in donor_pre_post
+fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({
+    'Post-FMT': 'PostFMT',
+    'Pre-FMT': 'PreFMT',
+    'Pre-Abx/FMT': 'PreFMT'
+})
 fmt_dataset = fmt_dataset[fmt_dataset['donor_pre_post'].isin(['PostFMT', 'PreFMT', 'Donor'])]
+
 
 # Renaming column for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})
@@ -40,7 +46,8 @@ mobilome_features = mge_merged.drop(columns=['gene_accession']).groupby('final_c
 # Resetting index and renaming for merging with FMT dataset
 mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
-
+fmt_dataset['run_accession'] = fmt_dataset['run_accession'].astype(str).str.strip()
+mobilome_features['ID'] = mobilome_features['ID'].astype(str).str.strip()
 # Merging mobilome features with donor_pre_post column
 merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
