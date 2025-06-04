@@ -20,17 +20,15 @@ df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoi
 # Convert sequencing depth to log scale
 df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["number_bases_gigabases"])
 
-# Initialize a wider figure
 plt.figure(figsize=(16, 6))
 
-# Scatter plot using seaborn scatterplot
 sns.scatterplot(x="timepoint", y="log_number_bases_gigabases", hue="Disease_type", data=df_filtered, alpha=0.6)
 
 # Fit LOESS curve for smoothing and compute confidence intervals using bootstrapping
 unique_diseases = df_filtered["Disease_type"].unique()
 colors = sns.color_palette("tab10", len(unique_diseases))
 
-n_boot = 1000  # Number of bootstrap samples
+n_boot = 1000
 
 for disease, color in zip(unique_diseases, colors):
     subset = df_filtered[df_filtered["Disease_type"] == disease].dropna(subset=["timepoint", "log_number_bases_gigabases"])
@@ -71,6 +69,4 @@ plt.ylabel("Log Sequencing Depth (Gigabases)")
 plt.title("Log Sequencing Depth Over Time by Disease Type with 95% CI")
 plt.legend()
 plt.grid(alpha=0.3)
-
-# Show the updated plot
 plt.show()

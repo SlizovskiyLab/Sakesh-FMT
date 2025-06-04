@@ -21,17 +21,14 @@ df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoi
 df_filtered["host_removal_input_reads"] = pd.to_numeric(df_filtered["host_removal_input_reads"], errors='coerce')
 df_filtered["host_removal_input_reads_millions"] = df_filtered["host_removal_input_reads"] / 1e6
 
-# Initialize a wider figure
 plt.figure(figsize=(16, 6))
-
-# Scatter plot using seaborn scatterplot
 sns.scatterplot(x="timepoint", y="host_removal_input_reads_millions", hue="Disease_type", data=df_filtered, alpha=0.6)
 
 # Fit LOESS curve for smoothing and compute confidence intervals using bootstrapping
 unique_diseases = df_filtered["Disease_type"].unique()
 colors = sns.color_palette("tab10", len(unique_diseases))
 
-n_boot = 1000  # Number of bootstrap samples
+n_boot = 1000 
 
 for disease, color in zip(unique_diseases, colors):
     subset = df_filtered[df_filtered["Disease_type"] == disease].dropna(subset=["timepoint", "host_removal_input_reads_millions"])
@@ -59,10 +56,10 @@ for disease, color in zip(unique_diseases, colors):
         lower_bound = np.percentile(y_boot_samples, 2.5, axis=0)
         upper_bound = np.percentile(y_boot_samples, 97.5, axis=0)
 
-        # Plot LOESS curve
+        # LOESS curve
         plt.plot(loess_x, loess_y, color=color, linewidth=2, label=f"{disease} LOESS")
         
-        # Plot confidence interval
+        # confidence interval
         plt.fill_between(loess_x, lower_bound, upper_bound, color=color, alpha=0.2)
 
 # Customize x-axis for better spacing
@@ -72,6 +69,4 @@ plt.ylabel("Host Removal Input Reads (Millions)")
 plt.title("Host Removal Input Reads Over Time by Disease Type with 95% CI")
 plt.legend()
 plt.grid(alpha=0.3)
-
-# Show the updated plot
 plt.show()

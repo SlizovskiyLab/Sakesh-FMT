@@ -12,14 +12,12 @@ fmt_df = pd.read_csv(fmt_file)
 mge_df = pd.read_csv(mge_file)
 amr_df = pd.read_csv(amr_file)
 
-# Keep only the first 264 rows of the FMT dataset
+# data cleaning
 fmt_df = fmt_df.iloc[:264]
-
-# Standardize 'donor_pre_post' values and remove 'Pre-Abx/FMT' and 'Max:'
 fmt_df["donor_pre_post"] = fmt_df["donor_pre_post"].replace({"Pre-FMT": "PreFMT", "Post-FMT": "PostFMT"})
 fmt_df = fmt_df[~fmt_df["donor_pre_post"].isin(["Pre-Abx/FMT", "Max:"])]
 
-# Sum MGE and AMR values across matching column IDs
+# Sum MGE and AMR values based on column IDs
 mge_sums = mge_df.set_index(mge_df.columns[0]).sum(axis=0)
 amr_sums = amr_df.set_index(amr_df.columns[0]).sum(axis=0)
 
@@ -37,12 +35,11 @@ merged_df["size_bin"] = pd.qcut(merged_df.index, 10, labels=False)  # 10 equal b
 # Scale sizes for better visualization
 merged_df["size"] = (merged_df["size_bin"] + 1) * 10 
 
-# Initialize the figure
 fig, ax = plt.subplots(figsize=(14, 8))  # Increased figure size
 
 # Define color and shape mapping
 palette = sns.color_palette("tab10", len(merged_df["study_data"].unique()))
-marker_styles = {"PreFMT": "o", "PostFMT": "s", "Donor": "^"}  # Different shapes for donor_pre_post
+marker_styles = {"PreFMT": "o", "PostFMT": "s", "Donor": "^"}
 
 # Scatter plot with different colors for study_data and shapes for donor_pre_post
 for (study, donor_status), subset in merged_df.groupby(["study_data", "donor_pre_post"]):
@@ -54,17 +51,10 @@ for (study, donor_status), subset in merged_df.groupby(["study_data", "donor_pre
         marker=marker_styles.get(donor_status, "o"), alpha=0.7
     )
 
-# Labels and title
 ax.set_xlabel("AMR (Summed)")
 ax.set_ylabel("MGE (Summed)")
 ax.set_title("MGE vs. AMR by Study Data and Donor Status (Sized by Percentile Bins)")
-
-# Adjust legend
 plt.subplots_adjust(left=0.1, right=0.75) 
 ax.legend(title="Study & Donor Status", bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small', frameon=True)
-
-# Grid for better readability
 ax.grid(alpha=0.3)
-
-# Show the updated plot
 plt.show()
