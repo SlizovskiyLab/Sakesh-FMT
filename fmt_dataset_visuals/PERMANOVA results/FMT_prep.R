@@ -3,55 +3,77 @@ library(vegan)     # for adonis2
 library(dplyr)     # for data manipulation
 library(readr)     # for reading CSVs
 
-# === Load the Aitchison distance matrix ===
-aitchison_df <- read_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_mobilome.csv")
-
-# Convert to distance matrix
-aitchison_mat <- as.matrix(aitchison_df[,-1])
-rownames(aitchison_mat) <- aitchison_df[[1]]
-distance_matrix <- as.dist(aitchison_mat)
-
-# === Load metadata ===
+# === Load metadata (shared for both datasets) ===
 metadata <- read_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/metadata_for_prep.csv")
 
-# Ensure row order matches distance matrix
-metadata <- metadata %>% filter(ID %in% rownames(aitchison_mat))
-metadata <- metadata[match(rownames(aitchison_mat), metadata$ID), ]
+# === MOBILOME PERMANOVA ===
 
-# Check alignment
-stopifnot(all(metadata$ID == rownames(aitchison_mat)))
+# Load Aitchison distance matrix for mobilome
+mobilome_df <- read_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_mobilome.csv")
+mobilome_mat <- as.matrix(mobilome_df[,-1])
+rownames(mobilome_mat) <- mobilome_df[[1]]
+mobilome_dist <- as.dist(mobilome_mat)
 
-# === Run PERMANOVA ===
-permanova_result <- adonis2(
-  distance_matrix ~ fmt_prep,
-  data = metadata,
+# Align metadata with mobilome
+mobilome_meta <- metadata %>% filter(ID %in% rownames(mobilome_mat))
+mobilome_meta <- mobilome_meta[match(rownames(mobilome_mat), mobilome_meta$ID), ]
+stopifnot(all(mobilome_meta$ID == rownames(mobilome_mat)))
+
+# Run PERMANOVA for mobilome
+mobilome_permanova <- adonis2(
+  mobilome_dist ~ fmt_prep,
+  data = mobilome_meta,
   permutations = 999,
-  strata = metadata$Patient # Controls for patient as a blocking factor
+  strata = mobilome_meta$Patient
 )
 
-# === View results ===
-print(permanova_result)
+# Print mobilome result
+cat("\n=== PERMANOVA: Mobilome ===\n")
+print(mobilome_permanova)
 
 
-# library(pairwiseAdonis)
-# 
-# # Convert the distance object to a square matrix
-# distance_matrix_mat <- as.matrix(distance_matrix)
-# 
-# # Subset to only rows/columns matching metadata
-# distance_matrix_mat <- distance_matrix_mat[metadata$ID, metadata$ID]
-# 
-# # Run pairwise.adonis2 on the full matrix
-# pairwise_results <- pairwise.adonis2(
-#   distance_matrix_mat,
-#   factors = metadata$fmt_prep,
-#   strata = metadata$Patient,
-#   perm = 999,
-#   p.adjust.m = "BH"
-# )
-# 
-# # View the result
-# print(pairwise_results)
-# 
-# # View pairwise comparison results
-# print(pairwise_results)
+# === RESISTOME PERMANOVA ===
+
+# Load Aitchison distance matrix for resistome
+resistome_df <- read_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_resistome.csv")
+resistome_mat <- as.matrix(resistome_df[,-1])
+rownames(resistome_mat) <- resistome_df[[1]]
+resistome_dist <- as.dist(resistome_mat)
+
+# Align metadata with resistome
+resistome_meta <- metadata %>% filter(ID %in% rownames(resistome_mat))
+resistome_meta <- resistome_meta[match(rownames(resistome_mat), resistome_meta$ID), ]
+stopifnot(all(resistome_meta$ID == rownames(resistome_mat)))
+
+# Run PERMANOVA for resistome
+resistome_permanova <- adonis2(
+  resistome_dist ~ fmt_prep,
+  data = resistome_meta,
+  permutations = 999,
+  strata = resistome_meta$Patient
+)
+
+# Print resistome result
+cat("\n=== PERMANOVA: Resistome ===\n")
+print(resistome_permanova)
+
+
+# === FDR-adjusted p-values (Benjamini-Hochberg) ===
+
+# Extract raw p-values
+raw_pvals <- c(
+  mobilome = mobilome_permanova$`Pr(>F)`[1],
+  resistome = resistome_permanova$`Pr(>F)`[1]
+)
+
+# Apply BH correction
+fdr_adjusted <- p.adjust(raw_pvals, method = "BH")
+
+# Report FDR-corrected p-values
+cat("\n=== FDR-adjusted p-values ===\n")
+fdr_result <- data.frame(
+  Test = names(raw_pvals),
+  Raw_P = raw_pvals,
+  FDR_Adjusted_P = fdr_adjusted
+)
+print(fdr_result)
