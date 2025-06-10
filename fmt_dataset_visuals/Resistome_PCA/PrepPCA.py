@@ -20,6 +20,13 @@ amr_matrix = pd.read_csv(amr_matrix_path)
 annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
+# Removing rows where 'Patient' or 'fmt_prep' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient', 'fmt_prep'])
+fmt_dataset = fmt_dataset[
+    (fmt_dataset['Patient'].astype(str).str.strip() != '') &
+    (fmt_dataset['fmt_prep'].astype(str).str.strip() != '')
+]
+
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
 
@@ -114,3 +121,11 @@ plt.title('PCA of Aitchison Distances for Resistome Samples (FMT prep)')
 plt.legend(title='FMT prep', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Saving Aitchison distance matrix for PERMANOVA
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_df['ID'],
+    columns=merged_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_resistome.csv")
