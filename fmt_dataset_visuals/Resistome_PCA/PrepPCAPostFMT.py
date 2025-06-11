@@ -29,6 +29,8 @@ fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({
     'Post-FMT': 'PostFMT'
 })
 
+fmt_dataset = fmt_dataset[fmt_dataset['donor_pre_post'] == 'PostFMT']
+
 # Removing rows where 'Patient' or 'fmt_prep' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient', 'fmt_prep'])
 fmt_dataset = fmt_dataset[
@@ -126,7 +128,7 @@ for disease in unique_diseases:
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Resistome Samples (FMT prep)')
+plt.title('PCA of Aitchison Distances for Resistome Samples (Post FMT only) (FMT prep)')
 plt.legend(title='FMT prep', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
@@ -137,4 +139,4 @@ aitchison_df = pd.DataFrame(
     index=merged_df['ID'],
     columns=merged_df['ID']
 )
-aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_resistome.csv")
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_prep_resistome_PostFMTonly.csv")
