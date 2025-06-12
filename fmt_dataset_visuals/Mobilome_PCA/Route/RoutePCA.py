@@ -112,6 +112,9 @@ for group in unique_groups:
     subset = merged_mobilome_df[merged_mobilome_df['fmt_route'] == group]
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, group_colors.get(group, 'gray'))
 
+plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 70)
+plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 70)
+
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
 plt.title('PCA of Aitchison Distances for Mobilome Samples (FMT Route)')
