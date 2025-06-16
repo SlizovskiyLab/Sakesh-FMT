@@ -19,6 +19,8 @@ mge_matrix = pd.read_csv(mge_matrix_path)
 mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
+
+
 fmt_dataset = fmt_dataset.iloc[:-5]
 
 # Standardize values in donor_pre_post
@@ -74,9 +76,6 @@ pca = PCA(n_components=2)
 pca_result = pca.fit_transform(aitchison_distances)
 merged_mobilome_df['PC1'] = pca_result[:, 0]
 merged_mobilome_df['PC2'] = pca_result[:, 1]
-
-# Ensuring no NaN values in 'donor_pre_post'
-merged_mobilome_df['donor_pre_post'] = merged_mobilome_df['donor_pre_post'].fillna('Unknown')
 
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):

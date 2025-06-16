@@ -63,9 +63,6 @@ pca_result = pca.fit_transform(aitchison_distances)
 merged_mobilome_df['PC1'] = pca_result[:, 0]
 merged_mobilome_df['PC2'] = pca_result[:, 1]
 
-# Ensuring no NaN values in 'study_data'
-merged_mobilome_df['study_data'] = merged_mobilome_df['study_data'].fillna('Unknown')
-
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):
     if len(x) < 2:
