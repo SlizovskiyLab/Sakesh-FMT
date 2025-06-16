@@ -25,11 +25,6 @@ fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 fmt_dataset = fmt_dataset.dropna(subset=['DNA_extraction_kit'])
 fmt_dataset = fmt_dataset[fmt_dataset['DNA_extraction_kit'].str.strip() != '']
 
-# Debug missing values
-missing_kits = fmt_dataset[fmt_dataset['DNA_extraction_kit'].isna()]
-print(f"Missing DNA_extraction_kit values in original dataset: {len(missing_kits)}")
-print(missing_kits)
-
 # Rename for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})
 

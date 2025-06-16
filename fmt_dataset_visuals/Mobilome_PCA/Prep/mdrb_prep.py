@@ -138,7 +138,7 @@ merged_mobilome_df = mobilome_features.merge(
 
 # Save metadata: ID, fmt_prep, Patient
 metadata_df = merged_mobilome_df[['ID', 'fmt_prep', 'Patient']]
-metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/metadata_for_mdrb_prep.csv", index=False)
+# metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/metadata_for_mdrb_prep.csv", index=False)
 
 # Save Aitchison distance matrix
 aitchison_df = pd.DataFrame(
@@ -146,5 +146,5 @@ aitchison_df = pd.DataFrame(
     index=merged_mobilome_df['ID'],
     columns=merged_mobilome_df['ID']
 )
-aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_mdrb_prep_mobilome.csv")
+# aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/aitchison_dist_matrix_mdrb_prep_mobilome.csv")
 
