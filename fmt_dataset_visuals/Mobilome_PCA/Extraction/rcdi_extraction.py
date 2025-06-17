@@ -111,15 +111,13 @@ for kit in unique_kits:
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, kit_colors.get(kit, 'gray'))
 
 # Expand axis limits
-plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 70)
-plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 70)
+plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 100)
+plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 100)
 
 # Adjust legend
 plt.legend(
     title='DNA Extraction Kit',
-    bbox_to_anchor=(1.05, 0.5),
-    loc='center left',
-    borderaxespad=0
+    loc='upper right'
 )
 
 plt.xlabel('Principal Component 1')

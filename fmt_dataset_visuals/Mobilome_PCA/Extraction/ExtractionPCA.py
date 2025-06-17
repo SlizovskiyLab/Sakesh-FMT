@@ -115,9 +115,7 @@ plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() 
 # Adjust legend
 plt.legend(
     title='DNA Extraction Kit',
-    bbox_to_anchor=(1.05, 0.5),
-    loc='center left',
-    borderaxespad=0
+    loc='upper right'
 )
 
 plt.xlabel('Principal Component 1')

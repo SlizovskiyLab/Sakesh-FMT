@@ -117,13 +117,13 @@ for disease in unique_diseases:
     subset = merged_df[merged_df['fmt_prep'] == disease]
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, disease_colors.get(disease, 'gray'))
 
-plt.xlim(merged_df['PC1'].min() - 150, merged_df['PC1'].max() + 70)
-plt.ylim(merged_df['PC2'].min() - 100, merged_df['PC2'].max() + 70)
+plt.xlim(merged_df['PC1'].min() - 500, merged_df['PC1'].max() + 550)
+plt.ylim(merged_df['PC2'].min() - 100, merged_df['PC2'].max() + 100)
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
 plt.title('PCA of Aitchison Distances for Resistome Samples (FMT prep)')
-plt.legend(title='FMT prep', bbox_to_anchor=(1, 1))
+plt.legend(title='FMT prep', bbox_to_anchor=(1, 1), loc='upper right')
 plt.grid(True)
 plt.show()
 
