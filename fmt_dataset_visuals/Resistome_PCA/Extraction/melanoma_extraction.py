@@ -43,7 +43,7 @@ fmt_dataset['DNA_extraction_kit'] = fmt_dataset['DNA_extraction_kit'].str.strip(
 fmt_dataset = fmt_dataset.dropna(subset=['DNA_extraction_kit'])
 
 # Merging with DNA_extraction_kit data from FMT dataset
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'DNA_extraction_kit']], left_on='ID', right_on='run_accession', how='left')
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'DNA_extraction_kit', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # Removing rows with missing DNA_extraction_kit values
@@ -124,3 +124,15 @@ plt.title('PCA of Aitchison Distances for Resistome Samples (DNA extraction kit)
 plt.legend(title='DNA extraction kit', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_df[['ID', 'DNA_extraction_kit', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/metadata_melanoma.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_df['ID'],
+    columns=merged_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/aitchison_melanoma.csv")

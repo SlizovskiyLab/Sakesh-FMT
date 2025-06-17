@@ -127,12 +127,6 @@ plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
 
-# Merge in 'fmt_prep' and 'Patient' from the original metadata
-merged_mobilome_df = mobilome_features.merge(
-    fmt_dataset[['run_accession', 'fmt_prep', 'Patient']],
-    left_on='ID', right_on='run_accession', how='left'
-).drop(columns=['run_accession'])
-
 # Save metadata: ID, fmt_prep, Patient
 metadata_df = merged_mobilome_df[['ID', 'fmt_prep', 'Patient']]
 metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/metadata_mdrb.csv", index=False)
