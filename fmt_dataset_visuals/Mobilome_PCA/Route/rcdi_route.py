@@ -43,7 +43,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with fmt_route column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_route']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_route', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Standardizing 'fmt_route' values
@@ -124,3 +124,16 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (FMT Route)')
 plt.legend(title='FMT Route', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_mobilome_df[['ID', 'fmt_route', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_mobilome_df['ID'],
+    columns=merged_mobilome_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv")

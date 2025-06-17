@@ -43,7 +43,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with study data from FMT dataset
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'study_data']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'study_data', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Applying Bayesian Missing Data Imputation
@@ -121,3 +121,15 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (Study Data)')
 plt.legend(title='Study Data', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_mobilome_df[['ID', 'study_data', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/metadata_melanoma.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_mobilome_df['ID'],
+    columns=merged_mobilome_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_melanoma.csv")

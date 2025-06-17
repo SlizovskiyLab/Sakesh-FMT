@@ -133,3 +133,15 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (Donor/Recipient)')
 plt.legend(title='Donor/Recipient Status', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_mobilome_df[['ID', 'donor_pre_post', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_melanoma.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_mobilome_df['ID'],
+    columns=merged_mobilome_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/aitchison_melanoma.csv")

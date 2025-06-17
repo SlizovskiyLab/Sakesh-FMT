@@ -43,7 +43,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with sequencer column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'sequencer']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'sequencer', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Standardizing 'sequencer' values
@@ -124,3 +124,15 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (Sequencer)')
 plt.legend(title='Sequencer', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_mobilome_df[['ID', 'sequencer', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/metadata_melanoma.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_mobilome_df['ID'],
+    columns=merged_mobilome_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/aitchison_melanoma.csv")
