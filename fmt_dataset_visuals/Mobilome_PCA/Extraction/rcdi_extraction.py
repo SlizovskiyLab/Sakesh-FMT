@@ -42,7 +42,7 @@ mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merge with metadata
 merged_mobilome_df = mobilome_features.merge(
-    fmt_dataset[['run_accession', 'DNA_extraction_kit']],
+    fmt_dataset[['run_accession', 'DNA_extraction_kit', 'Patient']],
     left_on='ID', right_on='run_accession', how='left'
 ).drop(columns=['run_accession'])
 
@@ -128,5 +128,17 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (DNA Extraction Kit)'
 plt.grid(True)
 
 # Save plot as SVG
-plt.savefig("C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\pca_plot_sample.svg", format='svg', dpi=300, bbox_inches='tight')
+# plt.savefig("C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\pca_plot_sample.svg", format='svg', dpi=300, bbox_inches='tight')
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_mobilome_df[['ID', 'DNA_extraction_kit', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata_rcdi.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_mobilome_df['ID'],
+    columns=merged_mobilome_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_rcdi.csv", index=False)

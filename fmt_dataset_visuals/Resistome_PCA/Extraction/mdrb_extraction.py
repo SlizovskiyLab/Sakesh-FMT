@@ -13,7 +13,7 @@ from matplotlib.patches import Ellipse
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"
 annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\megares_annotations_v3.00.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
 
 # Loading datasets
 amr_matrix = pd.read_csv(amr_matrix_path)
@@ -21,6 +21,10 @@ annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'MDRB']
+
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]

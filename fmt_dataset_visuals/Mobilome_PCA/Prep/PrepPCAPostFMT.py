@@ -62,7 +62,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with fmt_prep column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_prep']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_prep', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Applying Bayesian Missing Data Imputation

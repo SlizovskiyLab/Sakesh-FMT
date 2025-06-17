@@ -12,7 +12,7 @@ from matplotlib.patches import Ellipse
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
 mge_annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\MGE_total_classification.xlsx - Sheet1.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
 
 # Loading datasets
 mge_matrix = pd.read_csv(mge_matrix_path)
@@ -20,6 +20,10 @@ mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'Melanoma']
+
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 
 # Renaming column for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})

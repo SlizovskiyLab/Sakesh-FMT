@@ -12,7 +12,7 @@ from matplotlib.patches import Ellipse
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
 mge_annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\MGE_total_classification.xlsx - Sheet1.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
 
 # Loading datasets
 mge_matrix = pd.read_csv(mge_matrix_path)
@@ -37,7 +37,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with disease type from FMT dataset
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'Disease_type']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'Disease_type', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Applying Bayesian Missing Data Imputation

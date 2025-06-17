@@ -12,7 +12,7 @@ from matplotlib.patches import Ellipse
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
 mge_annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\MGE_total_classification.xlsx - Sheet1.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
 
 # Loading datasets
 mge_matrix = pd.read_csv(mge_matrix_path)
@@ -20,6 +20,10 @@ mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'MDRB']
+
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 
 # Renaming column for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})
@@ -39,7 +43,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with fmt_route column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_route']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_route', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Standardizing 'fmt_route' values

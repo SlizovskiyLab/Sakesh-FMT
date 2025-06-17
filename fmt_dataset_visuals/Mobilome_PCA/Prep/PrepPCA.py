@@ -51,7 +51,7 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging mobilome features with fmt_prep column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_prep']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_prep', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Applying Bayesian Missing Data Imputation
@@ -133,7 +133,7 @@ merged_mobilome_df = mobilome_features.merge(
 
 # Save metadata: ID, fmt_prep, Patient
 metadata_df = merged_mobilome_df[['ID', 'fmt_prep', 'Patient']]
-# metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/metadata_for_prep.csv", index=False)
+# metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata.csv", index=False)
 
 # Save Aitchison distance matrix
 aitchison_df = pd.DataFrame(

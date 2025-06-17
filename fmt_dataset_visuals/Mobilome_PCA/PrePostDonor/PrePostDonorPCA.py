@@ -12,7 +12,7 @@ from matplotlib.patches import Ellipse
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
 mge_annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\MGE_total_classification.xlsx - Sheet1.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
 
 # Loading datasets
 mge_matrix = pd.read_csv(mge_matrix_path)
@@ -51,7 +51,7 @@ mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 fmt_dataset['run_accession'] = fmt_dataset['run_accession'].astype(str).str.strip()
 mobilome_features['ID'] = mobilome_features['ID'].astype(str).str.strip()
 # Merging mobilome features with donor_pre_post column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post']], 
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 # Applying Bayesian Missing Data Imputation

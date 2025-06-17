@@ -40,7 +40,7 @@ mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merge with metadata
 merged_mobilome_df = mobilome_features.merge(
-    fmt_dataset[['run_accession', 'DNA_extraction_kit']],
+    fmt_dataset[['run_accession', 'DNA_extraction_kit', 'Patient']],
     left_on='ID', right_on='run_accession', how='left'
 ).drop(columns=['run_accession'])
 
