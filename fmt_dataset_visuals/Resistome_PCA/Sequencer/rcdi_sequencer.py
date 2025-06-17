@@ -22,6 +22,10 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
+
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
 
@@ -34,7 +38,7 @@ resistance_features.reset_index(inplace=True)
 resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # Merging with sequencer data from FMT dataset
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'sequencer']], left_on='ID', right_on='run_accession', how='left')
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'sequencer', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # Removing 'Unknown' category
@@ -115,3 +119,15 @@ plt.title('PCA of Aitchison Distances for Resistome Samples (Sequencer)')
 plt.legend(title='Sequencer', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_df[['ID', 'sequencer', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/metadata_rcdi.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_df['ID'],
+    columns=merged_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/aitchison_rcdi.csv")

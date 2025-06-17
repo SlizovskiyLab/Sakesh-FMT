@@ -22,6 +22,10 @@ amr_matrix = pd.read_csv(amr_matrix_path)
 annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
+
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
 # removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
@@ -36,7 +40,7 @@ resistance_features.reset_index(inplace=True)
 resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 
 # merging with study labels from FMT_dataset
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'study_data']], left_on='ID', right_on='run_accession', how='left')
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'study_data', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # applying Bayesian Missing Data Imputation
@@ -117,3 +121,15 @@ plt.title('PCA of Aitchison Distances for Resistome Samples (Study Data)')
 plt.legend(title='Study Data', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_df[['ID', 'study_data', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/metadata_rcdi.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_df['ID'],
+    columns=merged_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_rcdi.csv")

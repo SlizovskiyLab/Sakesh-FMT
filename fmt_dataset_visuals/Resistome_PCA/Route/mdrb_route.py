@@ -20,7 +20,9 @@ amr_matrix = pd.read_csv(amr_matrix_path)
 annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
-fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'MDRB']
+# Remove rows where 'Patient' is missing or blank
+fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
+fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'MDRB']
 
@@ -40,7 +42,7 @@ fmt_dataset['fmt_route'] = fmt_dataset['fmt_route'].str.strip()
 fmt_dataset = fmt_dataset.dropna(subset=['fmt_route'])
 
 # Merging with fmt_route data from FMT dataset
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'fmt_route']], left_on='ID', right_on='run_accession', how='left')
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'fmt_route', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # Removing rows with missing fmt_route values
@@ -121,3 +123,15 @@ plt.title('PCA of Aitchison Distances for Resistome Samples (FMT Route)')
 plt.legend(title='FMT Route', bbox_to_anchor=(1, 1))
 plt.grid(True)
 plt.show()
+
+# Save metadata: ID, fmt_prep, Patient
+metadata_df = merged_df[['ID', 'fmt_route', 'Patient']]
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_mdrb.csv", index=False)
+
+# Save Aitchison distance matrix
+aitchison_df = pd.DataFrame(
+    aitchison_distances,
+    index=merged_df['ID'],
+    columns=merged_df['ID']
+)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_mdrb.csv")
