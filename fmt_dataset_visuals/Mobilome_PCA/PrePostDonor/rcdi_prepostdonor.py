@@ -133,6 +133,7 @@ plt.ylabel('Principal Component 2')
 plt.title('PCA of Aitchison Distances for Mobilome Samples (Donor/Recipient)')
 plt.legend(title='Donor/Recipient Status', bbox_to_anchor=(1, 1), loc='upper right')
 plt.grid(True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight')
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

@@ -117,9 +117,10 @@ plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() 
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Mobilome Samples (Study Data)')
 plt.legend(title='Study Data', bbox_to_anchor=(1, 1), loc='upper right')
 plt.grid(True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight')
+
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

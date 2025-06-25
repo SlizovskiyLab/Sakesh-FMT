@@ -120,9 +120,9 @@ plt.legend(
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Mobilome Samples (DNA Extraction Kit)')
 plt.grid(True)
 
 # Save plot as SVG
 plt.savefig("C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\pca_plot_sample.svg", format='svg', dpi=300, bbox_inches='tight')
+
 plt.show()

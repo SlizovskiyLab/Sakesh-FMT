@@ -126,7 +126,7 @@ plt.title('PCA of Aitchison Distances for Mobilome Samples (DNA Extraction Kit)'
 plt.grid(True)
 
 # Save plot as SVG
-# plt.savefig("C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\pca_plot_sample.svg", format='svg', dpi=300, bbox_inches='tight')
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient
