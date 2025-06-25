@@ -120,9 +120,10 @@ plt.ylim(merged_df['PC2'].min() - 100, merged_df['PC2'].max() + 500)
 
 plt.xlabel('Principal Component 1')
 plt.ylabel('Principal Component 2')
-plt.title('PCA of Aitchison Distances for Resistome Samples (DNA extraction kit)')
 plt.legend(title='DNA extraction kit', bbox_to_anchor=(1, 1), loc='upper right')
 plt.grid(True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
+
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient
