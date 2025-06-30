@@ -3,7 +3,7 @@ import seaborn as sns
 import pandas as pd
 
 # Load the dataset
-file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_dataset.csv"
+file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
 df = pd.read_csv(file_path)
 df_filtered = df.iloc[:264]
 

@@ -5,7 +5,7 @@ import numpy as np
 import statsmodels.api as sm
 
 # Load the dataset
-file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_dataset.csv"
+file_path = file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
 df = pd.read_csv(file_path)
 
 # Filter out PreFMT samples
