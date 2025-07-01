@@ -47,7 +47,8 @@ merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'DNA_extract
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # Removing rows with missing DNA_extraction_kit values
-merged_df = merged_df.dropna(subset=['DNA_extraction_kit'])
+merged_df = merged_df[merged_df['DNA_extraction_kit'].notna()]
+merged_df = merged_df[merged_df['DNA_extraction_kit'].astype(str).str.strip() != '']
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)

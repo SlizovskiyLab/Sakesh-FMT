@@ -46,7 +46,8 @@ merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'fmt_route',
 merged_df.drop(columns=['run_accession'], inplace=True)
 
 # Removing rows with missing fmt_route values
-merged_df = merged_df.dropna(subset=['fmt_route'])
+merged_df = merged_df[merged_df['fmt_route'].notna()]
+merged_df = merged_df[merged_df['fmt_route'].astype(str).str.strip() != '']
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)

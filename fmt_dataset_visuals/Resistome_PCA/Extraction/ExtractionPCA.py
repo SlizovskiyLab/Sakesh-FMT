@@ -26,6 +26,8 @@ amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("Req
 # Merging with megares annotations to categorize resistance genes
 amr_merged = amr_matrix_filtered.merge(annotations[['header', 'group']], left_on='gene_accession', right_on='header', how='left').drop(columns=['header'])
 
+# amr_merged = amr_merged[amr_merged['DNA_extraction_kit'].notna()]
+
 # Summing values across genes for each ID, preserving individual resistance features
 resistance_features = amr_merged.drop(columns=['gene_accession', 'group']).groupby(amr_merged['group']).sum().T
 resistance_features.reset_index(inplace=True)

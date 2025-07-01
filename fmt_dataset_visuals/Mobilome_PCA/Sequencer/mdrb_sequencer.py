@@ -49,6 +49,8 @@ merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'sequ
 # Standardizing 'sequencer' values
 merged_mobilome_df['sequencer'] = merged_mobilome_df['sequencer'].replace({'Frozen': 'frozen'})
 
+merged_mobilome_df = merged_mobilome_df[merged_mobilome_df['sequencer'].notna()]
+
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'sequencer']))

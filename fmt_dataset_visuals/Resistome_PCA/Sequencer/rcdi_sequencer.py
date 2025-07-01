@@ -41,6 +41,9 @@ resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'sequencer', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
+merged_df = merged_df[merged_df['sequencer'].notna()]
+merged_df = merged_df[merged_df['sequencer'].astype(str).str.strip() != '']
+
 # Removing 'Unknown' category
 merged_df = merged_df[merged_df['sequencer'] != 'Unknown']
 

@@ -46,6 +46,8 @@ merged_mobilome_df = mobilome_features.merge(
     left_on='ID', right_on='run_accession', how='left'
 ).drop(columns=['run_accession'])
 
+merged_mobilome_df = merged_mobilome_df[merged_mobilome_df['DNA_extraction_kit'].notna()]
+
 # KNN imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'DNA_extraction_kit']))

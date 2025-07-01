@@ -44,6 +44,9 @@ merged_df.drop(columns=['run_accession'], inplace=True)
 # Removing 'Unknown' category
 merged_df = merged_df[merged_df['sequencer'] != 'Unknown']
 
+merged_df = merged_df[merged_df['sequencer'].notna()]
+merged_df = merged_df[merged_df['sequencer'].astype(str).str.strip() != '']
+
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'sequencer']))

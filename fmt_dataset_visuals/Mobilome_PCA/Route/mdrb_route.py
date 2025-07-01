@@ -46,6 +46,8 @@ mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'fmt_route', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
+merged_mobilome_df = merged_mobilome_df[merged_mobilome_df['fmt_route'].notna()]
+
 # Standardizing 'fmt_route' values
 merged_mobilome_df['fmt_route'] = merged_mobilome_df['fmt_route'].replace({'Frozen': 'frozen'})
 

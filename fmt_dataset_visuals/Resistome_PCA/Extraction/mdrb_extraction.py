@@ -45,6 +45,8 @@ fmt_dataset = fmt_dataset.dropna(subset=['DNA_extraction_kit'])
 merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'DNA_extraction_kit', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
+merged_df = merged_df[merged_df['DNA_extraction_kit'].notna()]
+
 # Removing rows with missing DNA_extraction_kit values
 merged_df = merged_df.dropna(subset=['DNA_extraction_kit'])
 

@@ -43,6 +43,9 @@ resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'study_data', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
 
+merged_df = merged_df[merged_df['study_data'].notna()]
+merged_df = merged_df[merged_df['study_data'].astype(str).str.strip() != '']
+
 # applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'study_data']))
