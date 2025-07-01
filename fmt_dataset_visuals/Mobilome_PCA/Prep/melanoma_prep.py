@@ -45,6 +45,7 @@ mge_merged = mge_matrix.merge(
     how='left'
 )
 
+
 # Aggregating by 'final_classification' (summation across samples)
 mobilome_features = mge_merged.drop(columns=['gene_accession']).groupby('final_classification').sum().T
 
@@ -137,5 +138,5 @@ aitchison_df = pd.DataFrame(
     index=merged_mobilome_df['ID'],
     columns=merged_mobilome_df['ID']
 )
-metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/aitchison_melanoma.csv", index=False)
+metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/aitchison_melanoma.csv")
 

@@ -138,4 +138,4 @@ aitchison_df = pd.DataFrame(
     index=merged_mobilome_df['ID'],
     columns=merged_mobilome_df['ID']
 )
-aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_rcdi.csv", index=False)
+aitchison_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_rcdi.csv")
