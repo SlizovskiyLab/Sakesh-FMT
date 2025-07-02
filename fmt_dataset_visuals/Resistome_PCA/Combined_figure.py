@@ -58,5 +58,7 @@ fig.suptitle("PCA of Aitchison Distances for Resistome Samples",
 # Save output
 fig.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/pca_combined_final.svg",
             format='svg', dpi=300, bbox_inches='tight')
+fig.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/pca_combined.png",
+            format='png', dpi=300, bbox_inches='tight')
 
 plt.show()
