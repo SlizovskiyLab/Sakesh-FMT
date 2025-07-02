@@ -80,6 +80,11 @@ study_melanoma_mob <- run_permanova_two_groups(
 )
 
 
+
+
+
+
+
 prep_mdrb_res <- run_permanova_two_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Prep/aitchison_mdrb.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Prep/metadata_mdrb.csv",

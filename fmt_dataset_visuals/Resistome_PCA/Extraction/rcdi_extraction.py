@@ -48,6 +48,8 @@ merged_df.drop(columns=['run_accession'], inplace=True)
 # Removing rows with missing DNA_extraction_kit values
 merged_df = merged_df.dropna(subset=['DNA_extraction_kit'])
 
+merged_df = merged_df.drop_duplicates(subset='ID')
+
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
 imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'DNA_extraction_kit']))
