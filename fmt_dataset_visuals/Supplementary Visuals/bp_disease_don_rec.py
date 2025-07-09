@@ -50,6 +50,6 @@ plt.ylabel("Throughput (Gigabases)")
 plt.title("Throughput by Disease Type and Donor/Recipient Status")
 plt.grid(axis="y", linestyle="--", alpha=0.7)
 plt.tight_layout()
-plt.savefig("bp_disease_donor_rec.png", format='png', dpi=600, bbox_inches='tight')
+plt.savefig("C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\bp_disease_donor_rec.png", format='png', dpi=600, bbox_inches='tight')
 
 plt.show()
