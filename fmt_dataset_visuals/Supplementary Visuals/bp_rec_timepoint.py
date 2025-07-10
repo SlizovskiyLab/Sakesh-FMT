@@ -5,20 +5,32 @@ import numpy as np
 import statsmodels.api as sm
 
 # Load the dataset
-file_path = file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
+file_path = file_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_with_throughput.csv"
 df = pd.read_csv(file_path)
 
-# Filter out PreFMT samples
-df_filtered = df[df["donor_pre_post"] != "PreFMT"].copy()
+df_filtered = df[df["donor_pre_post"] != "Pre-Abx/FMT"]
+df_filtered["donor_pre_post"] = df_filtered["donor_pre_post"].replace(
+    {"Pre-FMT": "PreFMT", "Post-FMT": "PostFMT"}
+)
 
-# Ensure Post-FMT is labeled consistently
-df_filtered["donor_pre_post"] = df_filtered["donor_pre_post"].replace({"Post-FMT": "PostFMT"})
+# Filter out PreFMT samples
+df_filtered = df_filtered[df_filtered["donor_pre_post"] != "PreFMT"].copy()
 
 # Remove data points above 200 days and at 0 days
 df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoint"] <= 200)]
 
+# Convert the throughput column to a numeric type
+throughput_col = "Throughput"
+df_filtered[throughput_col] = df_filtered[throughput_col].astype(str).str.replace(',', '')
+df_filtered[throughput_col] = pd.to_numeric(df_filtered[throughput_col], errors='coerce')
+df_filtered.dropna(subset=[throughput_col], inplace=True)
+
+# Create a new column for throughput in Gigabases
+df_filtered["Throughput_GB"] = df_filtered[throughput_col] / 1e9
+
+
 # Convert sequencing depth to log scale
-df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["number_bases_gigabases"])
+df_filtered["log_number_bases_gigabases"] = np.log10(df_filtered["Throughput_GB"])
 
 plt.figure(figsize=(16, 6))
 

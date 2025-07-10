@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from matplotlib.lines import Line2D  # For custom legend handles
 
 # Load datasets
 fmt_file = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
@@ -12,7 +13,7 @@ fmt_df = pd.read_csv(fmt_file)
 mge_df = pd.read_csv(mge_file)
 amr_df = pd.read_csv(amr_file)
 
-# data cleaning
+# Data cleaning
 fmt_df = fmt_df.iloc[:264]
 fmt_df["donor_pre_post"] = fmt_df["donor_pre_post"].replace({"Pre-FMT": "PreFMT", "Post-FMT": "PostFMT"})
 fmt_df = fmt_df[~fmt_df["donor_pre_post"].isin(["Pre-Abx/FMT", "Max:"])]
@@ -38,23 +39,47 @@ merged_df["size"] = (merged_df["size_bin"] + 1) * 10
 fig, ax = plt.subplots(figsize=(14, 8))  # Increased figure size
 
 # Define color and shape mapping
-palette = sns.color_palette("tab10", len(merged_df["study_data"].unique()))
+study_labels = merged_df["study_data"].unique()
+palette = sns.color_palette("tab10", len(study_labels))
 marker_styles = {"PreFMT": "o", "PostFMT": "s", "Donor": "^"}
 
-# Scatter plot with different colors for study_data and shapes for donor_pre_post
+# Scatter plot
 for (study, donor_status), subset in merged_df.groupby(["study_data", "donor_pre_post"]):
     ax.scatter(
         subset["AMR"], subset["MGE"],
-        s=subset["size"],  # Set sizes based on percentile bins
+        s=subset["size"],
         label=f"{study}, {donor_status}",
-        color=palette[list(merged_df["study_data"].unique()).index(study)],
-        marker=marker_styles.get(donor_status, "o"), alpha=0.7
+        color=palette[list(study_labels).index(study)],
+        marker=marker_styles.get(donor_status, "o"),
+        alpha=0.7
     )
 
-ax.set_xlabel("AMR (Summed)")
-ax.set_ylabel("MGE (Summed)")
-ax.set_title("MGE vs. AMR by Study Data and Donor Status (Sized by Percentile Bins)")
+# Set axis labels, log scale, title
+ax.set_xlabel("Log AMR (Summed)")
+ax.set_ylabel("Log MGE (Summed)")
+ax.set_title("Log-scaled MGE vs. AMR by Study Data and Donor Status (Sized by Percentile Bins)")
+ax.set_yscale("log")
+ax.set_xscale("log")
 plt.subplots_adjust(left=0.1, right=0.75) 
-ax.legend(title="Study & Donor Status", bbox_to_anchor=(1.05, 1), loc='upper left', fontsize='small', frameon=True)
+
+# Create custom legends
+color_handles = [
+    Line2D([0], [0], marker='o', color='w',
+           markerfacecolor=palette[i], markersize=10, label=label)
+    for i, label in enumerate(study_labels)
+]
+
+shape_handles = [
+    Line2D([0], [0], marker=marker_styles[status], color='k',
+           linestyle='None', markersize=10, label=status)
+    for status in marker_styles
+]
+
+# Add legends
+legend1 = ax.legend(handles=color_handles, title="Study", bbox_to_anchor=(1.05, 1), loc='upper left')
+legend2 = ax.legend(handles=shape_handles, title="Donor Status", bbox_to_anchor=(1.05, 0.4), loc='upper left')
+ax.add_artist(legend1)
+
 ax.grid(alpha=0.3)
+ax.grid(False)
 plt.show()

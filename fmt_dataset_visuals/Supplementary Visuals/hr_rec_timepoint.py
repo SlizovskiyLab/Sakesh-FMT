@@ -21,8 +21,10 @@ df_filtered = df_filtered[(df_filtered["timepoint"] > 0) & (df_filtered["timepoi
 df_filtered["host_removal_input_reads"] = pd.to_numeric(df_filtered["host_removal_input_reads"], errors='coerce')
 df_filtered["host_removal_input_reads_millions"] = df_filtered["host_removal_input_reads"] / 1e6
 
+df_filtered["log_host_removal_input"] = np.log10(df_filtered["host_removal_input_reads_millions"])
+
 plt.figure(figsize=(16, 6))
-sns.scatterplot(x="timepoint", y="host_removal_input_reads_millions", hue="Disease_type", data=df_filtered, alpha=0.6)
+sns.scatterplot(x="timepoint", y="log_host_removal_input", hue="Disease_type", data=df_filtered, alpha=0.6)
 
 # Fit LOESS curve for smoothing and compute confidence intervals using bootstrapping
 unique_diseases = df_filtered["Disease_type"].unique()
@@ -31,11 +33,11 @@ colors = sns.color_palette("tab10", len(unique_diseases))
 n_boot = 1000 
 
 for disease, color in zip(unique_diseases, colors):
-    subset = df_filtered[df_filtered["Disease_type"] == disease].dropna(subset=["timepoint", "host_removal_input_reads_millions"])
+    subset = df_filtered[df_filtered["Disease_type"] == disease].dropna(subset=["timepoint", "log_host_removal_input"])
     
     if not subset.empty:
         x_sorted = np.sort(subset["timepoint"])
-        y_sorted = subset["host_removal_input_reads_millions"].iloc[np.argsort(subset["timepoint"])]
+        y_sorted = subset["log_host_removal_input"].iloc[np.argsort(subset["timepoint"])]
 
         # Compute LOESS fit
         lowess_result = sm.nonparametric.lowess(y_sorted, x_sorted, frac=0.5)
@@ -46,7 +48,7 @@ for disease, color in zip(unique_diseases, colors):
         for _ in range(n_boot):
             sample_indices = np.random.choice(len(subset), len(subset), replace=True)
             x_sampled = subset["timepoint"].iloc[sample_indices]
-            y_sampled = subset["host_removal_input_reads_millions"].iloc[sample_indices]
+            y_sampled = subset["log_host_removal_input"].iloc[sample_indices]
 
             lowess_boot = sm.nonparametric.lowess(y_sampled, x_sampled, frac=0.5)
             y_boot_samples.append(np.interp(loess_x, lowess_boot[:, 0], lowess_boot[:, 1]))
@@ -65,8 +67,8 @@ for disease, color in zip(unique_diseases, colors):
 # Customize x-axis for better spacing
 plt.xticks(rotation=45, ha="right")
 plt.xlabel("Timepoint (Days)")
-plt.ylabel("Host Removal Input Reads (Millions)")
-plt.title("Host Removal Input Reads Over Time by Disease Type with 95% CI")
+plt.ylabel("Log Host Removal Input Reads (Millions)")
+plt.title("Log Host Removal Input Reads Over Time by Disease Type with 95% CI")
 plt.legend()
 plt.grid(alpha=0.3)
 plt.show()
