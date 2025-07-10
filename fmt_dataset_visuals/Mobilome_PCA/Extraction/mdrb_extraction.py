@@ -116,15 +116,17 @@ for kit in unique_kits:
 plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 100)
 plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 100)
 
-# Adjust legend
-plt.legend(
-    title='DNA Extraction Kit',
-    loc='upper right'
-)
-
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.grid(True)
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+legend = plt.legend()
+legend.set_visible(False)
 
 # # Save plot as SVG
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight')

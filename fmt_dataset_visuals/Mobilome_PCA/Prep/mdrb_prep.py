@@ -120,11 +120,11 @@ for group in unique_groups:
 plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 70)
 plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 70)
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
+plt.xlabel('Principal Component 1', fontsize=25, fontweight='bold')
+plt.ylabel('Principal Component 2', fontsize=25, fontweight='bold')
 plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1), loc='upper right')
 plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mrdb.svg", format='svg', dpi=600, bbox_inches='tight')
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight')
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

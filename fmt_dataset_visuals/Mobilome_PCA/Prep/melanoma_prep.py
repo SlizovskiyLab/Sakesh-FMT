@@ -107,24 +107,40 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
     ax.add_patch(ellipse)
 
 # Creating scatter plot and explicitly setting color palette
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(8, 6))
+ax = plt.gca()
 unique_groups = merged_mobilome_df['fmt_prep'].unique()
 palette = sns.color_palette('tab10', len(unique_groups))
 group_colors = {group: palette[i] for i, group in enumerate(unique_groups)}
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_prep', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
+ax = sns.scatterplot(
+    x='PC1', y='PC2',
+    hue='fmt_prep',
+    data=merged_mobilome_df,
+    palette=group_colors,
+    alpha=0.7,
+    edgecolor='k'
+)
 
 for group in unique_groups:
     subset = merged_mobilome_df[merged_mobilome_df['fmt_prep'] == group]
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, group_colors.get(group, 'gray'))
 
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+legend = plt.legend()
+legend.set_visible(False)
 plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 70)
 plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 70)
+# plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1), loc='upper right')
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1), loc='upper right')
-plt.grid(True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
 plt.show()
 
