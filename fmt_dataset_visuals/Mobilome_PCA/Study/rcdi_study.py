@@ -21,6 +21,22 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
+fmt_dataset['study_data'] = fmt_dataset['study_data'].replace({
+    'IaniroG_2022': 'Ianiro',
+    'LeoS_2020': 'Leo',
+    'BarYosephH_2020': 'Bar Yoseph',
+    'BaruchE_2020': 'Baruch',
+    'Davar_et_al_2021': 'Davar',
+    'SmillieC_2018': 'Smillie',
+    'Watson_et_al_2021': 'Watson',
+    'KumarR_2017': 'Kumar',
+    'VermaS_2021': 'Verma',
+    'PodlesnyD_2020': 'Podlesny',
+    'HouriganS_2019': 'Hourigan',
+    'Aggarwala_et_al_2021': 'Aggarwala',
+    'MossE_2017': 'Moss',
+})
+
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -127,7 +143,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-plt.legend(bbox_to_anchor=(1.6, 0.5), loc='right', markerscale=5, fontsize=25)
+# plt.legend(bbox_to_anchor=(1.6, 0.5), loc='right', markerscale=5, fontsize=25)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 

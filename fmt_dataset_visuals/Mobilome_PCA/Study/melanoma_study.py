@@ -21,6 +21,14 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'Melanoma']
 
+fmt_dataset['study_data'] = fmt_dataset['study_data'].replace({
+    'IaniroG_2022': 'Ianiro',
+    'LeoS_2020': 'Leo',
+    'BarYosephH_2020': 'Bar Yoseph',
+    'BaruchE_2020': 'Baruch',
+    'Davar_et_al_2021': 'Davar',
+})
+
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -127,7 +135,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-legend.set_visible(False)
+# legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 

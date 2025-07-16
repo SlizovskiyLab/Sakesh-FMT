@@ -108,10 +108,12 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['fmt_prep'].unique()
-palette = sns.color_palette('tab10', len(unique_groups))
-group_colors = {group: palette[i] for i, group in enumerate(unique_groups)}
+group_colors = {
+    'fresh': 'blue',
+    'frozen': 'red'
+}
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_prep', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
+ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_prep', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k', s=50)
 
 for group in unique_groups:
     subset = merged_mobilome_df[merged_mobilome_df['fmt_prep'] == group]

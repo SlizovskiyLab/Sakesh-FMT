@@ -21,6 +21,20 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
+fmt_dataset['DNA_extraction_kit'] = fmt_dataset['DNA_extraction_kit'].replace({
+    'DNeasy_PowerSoil_Pro_Kit': 'DNeasy Pro',
+    'MagCore_Genomic_DNA_Tissue_Kit_MODIFIED': 'MagCore',
+    'PureLink_Genomic_DNA_Mini_Kit': 'PureLink mini',
+    'DNeasy_PowerSoil_Kit': 'DNeasy',
+    'QIAamp_DNA_Stool_Mini_Kit': 'QIAamp',
+    'MoBio_PowerSoil': 'MoBio PS',
+    ' NucleoSpin_Soil': 'NucleoSpin',
+    'MoBio_Microbiome': 'MoBio MB',
+    'phenol_chloroform': 'Phenol',
+    'Zymo_fecal_DNA_isolation_Kit': 'Zymo',
+    'Purelink_Microbiome_DNA_purification_Kit': 'PureLink'
+})
+
 # Clean FMT dataset
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -127,7 +141,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
+# plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
 
 # Save plot as SVG
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)

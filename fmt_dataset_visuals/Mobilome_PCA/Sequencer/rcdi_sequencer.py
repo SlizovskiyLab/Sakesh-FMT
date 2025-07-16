@@ -21,6 +21,16 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
+fmt_dataset['sequencer'] = fmt_dataset['sequencer'].replace({
+    'Illumina_NovaSeq_6000': 'Illumina 6000',
+    'NextSeq_500': 'NextSeq 500',
+    'HiSeq_X_Ten': 'HiSeq 10',
+    'Illumina_HiSeq_4000': 'Illumina 4000',
+    'Illumina_HiSeq_2500': 'Illumina 2500',
+    'Illumina_HiSeq_3000': 'Illumina 3000',
+    'Illumina_Genome_Analyzer_IIx': 'Illumina Genome',
+})
+
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -130,7 +140,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
+# plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 

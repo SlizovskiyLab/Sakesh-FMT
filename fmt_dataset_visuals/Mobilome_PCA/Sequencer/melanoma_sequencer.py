@@ -21,6 +21,12 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'Melanoma']
 
+fmt_dataset['sequencer'] = fmt_dataset['sequencer'].replace({
+    'Illumina_NovaSeq_6000': 'Illumina 6000',
+    'NextSeq_500': 'NextSeq 500',
+    'HiSeq_X_Ten': 'HiSeq 10',
+})
+
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -130,7 +136,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-legend.set_visible(False)
+# legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 

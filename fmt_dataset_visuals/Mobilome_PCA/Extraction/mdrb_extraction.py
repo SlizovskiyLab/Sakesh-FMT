@@ -20,6 +20,11 @@ mge_annotations = pd.read_csv(mge_annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'MDRB']
+fmt_dataset['DNA_extraction_kit'] = fmt_dataset['DNA_extraction_kit'].replace({
+    'DNeasy_PowerSoil_Pro_Kit': 'DNeasy Pro',
+    'MagCore_Genomic_DNA_Tissue_Kit_MODIFIED': 'MagCore',
+    'PureLink_Genomic_DNA_Mini_Kit': 'PureLink mini'
+})
 
 # Clean FMT dataset
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])

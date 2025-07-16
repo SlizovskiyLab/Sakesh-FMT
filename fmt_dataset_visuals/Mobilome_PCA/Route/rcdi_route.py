@@ -21,6 +21,20 @@ fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
 
+fmt_dataset['fmt_route'] = fmt_dataset['fmt_route'].replace({
+    'oral_capsule': 'Oral Capsule',
+    '30 capsules': 'Oral Capsule',
+    'Nasogastric_tube_(single)': 'Nasogastric',
+    'Nasogastric tube (single)': 'Nasogastric',
+    'Nasogastric tube, single': 'Nasogastric',
+    'Enteroscopy and colonoscopy, single': 'Colonoscopy/Enteroscopy',
+    'colonoscopy_or_nasogastric_tube': 'Colonoscopy/Nasogastric',
+    'nasoduodenal tube': 'Nasoduodenal',
+    'Colonoscopy, single, + 12 capsules every 2 weeks for 90 days': 'Colonoscopy & Capsule',
+    'colonoscopy': 'Colonoscopy',
+    'Colonoscopy, single': 'Colonoscopy',
+})
+
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
@@ -130,7 +144,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
+# plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 
