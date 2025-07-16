@@ -117,14 +117,16 @@ for group in unique_groups:
     subset = merged_mobilome_df[merged_mobilome_df['fmt_prep'] == group]
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, group_colors.get(group, 'gray'))
 
-plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 70)
-plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 70)
+plt.xlim(merged_mobilome_df['PC1'].min() - 80, merged_mobilome_df['PC1'].max() + 40)
+plt.ylim(merged_mobilome_df['PC2'].min() - 50, merged_mobilome_df['PC2'].max() + 30)
 
 plt.xlabel('Principal Component 1', fontsize=25, fontweight='bold')
 plt.ylabel('Principal Component 2', fontsize=25, fontweight='bold')
-plt.legend(title='FMT Preparation', bbox_to_anchor=(1, 1), loc='upper right')
+legend = plt.legend()
+legend.set_visible(False)
 plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight')
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

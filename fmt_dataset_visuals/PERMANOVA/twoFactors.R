@@ -25,7 +25,7 @@ run_permanova_two_groups <- function(distance_matrix_path, metadata_path, group_
     distance_dist ~ GroupFactor,
     data = metadata,
     permutations = permutations,
-    strata = metadata$Patient,
+    #strata = metadata$Patient,
     method = "euclidean"
   )
   

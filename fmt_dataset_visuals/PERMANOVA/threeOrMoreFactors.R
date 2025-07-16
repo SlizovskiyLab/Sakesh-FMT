@@ -57,7 +57,7 @@ run_pairwise_permanova_multi_groups <- function(distance_matrix_path, metadata_p
       as.dist(sub_mat) ~ GroupFactor,
       data = sub_meta,
       permutations = permutations,
-      strata = sub_meta$Patient,
+      #strata = sub_meta$Patient,
       method = "euclidean"
     )
     
@@ -91,12 +91,12 @@ extrac_rcdi_mob <- run_pairwise_permanova_multi_groups(
   group_column = "DNA_extraction_kit"
 )
 
-# 
-# route_mdrb_mob <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_mdrb.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_mdrb.csv",
-#   group_column = "fmt_route"
-# )
+ 
+route_mdrb_mob <- run_pairwise_permanova_multi_groups(
+ distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_mdrb.csv",
+ metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_mdrb.csv",
+ group_column = "fmt_route"
+)
 # route_rcdi_mob <- run_pairwise_permanova_multi_groups(
 #   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv",
 #   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv",

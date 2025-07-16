@@ -126,10 +126,11 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-legend.set_visible(False)
+# legend.set_visible(False)
 
 # # Save plot as SVG
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight')
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

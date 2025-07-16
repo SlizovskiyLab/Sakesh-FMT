@@ -56,7 +56,7 @@ fig.suptitle("PCA of Aitchison Distances for Mobilome Samples",
              fontsize=12, fontweight='bold', y=0.96)
 
 # Save output
-fig.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/pca_combined_final.svg",
-            format='svg', dpi=300, bbox_inches='tight')
+fig.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/pca_combined_final.png",
+            format='png', dpi=300, bbox_inches='tight')
 
 plt.show()

@@ -1,54 +1,45 @@
-plot_r2_permanova_individual <- function(permanova_results_named_list, output_dir = NULL, prefix = "permanova_r2") {
-  library(ggplot2)
-  library(dplyr)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+
+plot_pairwise_permanova_heatmap <- function(pairwise_df, title = NULL, fdr_threshold = 0.05) {
+  # Check required columns
+  stopifnot(all(c("Group1", "Group2", "R2", "padj") %in% names(pairwise_df)))
   
-  for (name in names(permanova_results_named_list)) {
-    result <- permanova_results_named_list[[name]]
-    
-    # Convert result to data frame and extract terms
-    result_df <- as.data.frame(result)
-    result_df$Term <- rownames(result_df)
-    result_df <- result_df %>%
-      filter(!(Term %in% c("Residual", "Total"))) %>%
-      select(Term, R2)
-    
-    # Create plot
-    p <- ggplot(result_df, aes(x = reorder(Term, -R2), y = R2)) +
-      geom_bar(stat = "identity", fill = "darkorange") +
-      theme_minimal() +
-      labs(
-        title = paste("PERMANOVA R² -", name),
-        x = "Term",
-        y = expression(R^2)
-      ) +
-      ylim(0, 1) +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
-    
-    print(p)  # Show plot
-    
-    # Optionally save plot
-    if (!is.null(output_dir)) {
-      ggsave(filename = file.path(output_dir, paste0(prefix, "_", name, ".png")), plot = p, width = 6, height = 4)
-    }
+  # Filter to significant results only
+  sig_df <- pairwise_df %>%
+    filter(padj < fdr_threshold) %>%
+    mutate(Signif = "*")
+  
+  # If no significant results, return message
+  if (nrow(sig_df) == 0) {
+    message("No significant pairwise comparisons (padj < ", fdr_threshold, ")")
+    return(NULL)
   }
+  
+  # Create symmetric pairs
+  sig_df_sym <- sig_df %>%
+    bind_rows(sig_df %>%
+                rename(Group1 = Group2, Group2 = Group1)) %>%
+    mutate(Signif = "*")
+  
+  # Ensure full factor levels for axis consistency
+  all_groups <- unique(c(sig_df$Group1, sig_df$Group2))
+  
+  # Plot
+  ggplot(sig_df_sym, aes(x = Group1, y = Group2, fill = R2)) +
+    geom_tile(color = "white") +
+    geom_text(aes(label = sprintf("R²=%.2f\n%s", R2, Signif)), size = 3.5) +
+    scale_fill_gradient(low = "white", high = "firebrick", na.value = "grey90") +
+    scale_x_discrete(limits = all_groups) +
+    scale_y_discrete(limits = all_groups) +
+    coord_fixed() +
+    labs(
+      title = title,
+      x = NULL,
+      y = NULL,
+      fill = "PERMANOVA R²"
+    ) +
+    theme_minimal(base_size = 14) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
 }
-
-
-all_permanova_results <- list(
-  prep_mdrb_mob = prep_mdrb_mob,
-  prep_rcdi_mob = prep_rcdi_mob,
-  extrac_melanoma_mob = extrac_melanoma_mob,
-  route_melanoma_mob = route_melanoma_mob,
-  sequencer_melanoma_mob = sequencer_melanoma_mob,
-  sequencer_mdrb_mob = sequencer_mdrb_mob,
-  study_melanoma_mob = study_melanoma_mob,
-  prep_mdrb_res = prep_mdrb_res,
-  prep_rcdi_res = prep_rcdi_res,
-  extrac_melanoma_res = extrac_melanoma_res,
-  route_melanoma_res = route_melanoma_res,
-  sequencer_melanoma_res = sequencer_melanoma_res,
-  sequencer_mdrb_res = sequencer_mdrb_res,
-  study_melanoma_res = study_melanoma_res
-)
-
-plot_r2_permanova_individual(all_permanova_results, output_dir = NULL)
