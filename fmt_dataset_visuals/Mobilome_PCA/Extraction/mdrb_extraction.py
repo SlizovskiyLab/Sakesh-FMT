@@ -100,8 +100,20 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Plotting
 plt.figure(figsize=(10, 6))
 unique_kits = merged_mobilome_df['DNA_extraction_kit'].unique()
-palette = sns.color_palette('tab10', len(unique_kits))
-kit_colors = {kit: palette[i] for i, kit in enumerate(unique_kits)}
+kit_colors = {
+    'DNeasy Pro': 'red',
+    'MagCore': 'blue',
+    'PureLink mini': 'green',
+    'DNeasy': 'orange',
+    'QIAamp' : 'Purple',
+    'MoBio PS': 'brown',
+    'NucleoSpin': 'yellow',
+    'MoBio MB': 'Pink',
+    'Phenol': 'lightblue',
+    'Zymo': 'maroon',
+    'PureLink' : 'coral'
+}
+
 
 ax = sns.scatterplot(
     x='PC1', y='PC2',

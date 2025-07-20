@@ -58,6 +58,8 @@ mobilome_features['ID'] = mobilome_features['ID'].astype(str).str.strip()
 # Merging mobilome features with donor_pre_post column
 merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
+merged_mobilome_df = merged_mobilome_df.dropna(subset=['donor_pre_post', 'Patient'])
+
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)

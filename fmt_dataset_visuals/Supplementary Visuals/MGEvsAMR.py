@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-from matplotlib.lines import Line2D  # For custom legend handles
+from matplotlib.lines import Line2D
+import statsmodels.api as sm
+import statsmodels.formula.api as smf
 
 # Load datasets
 fmt_file = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset.csv"
@@ -35,6 +37,18 @@ merged_df["size_bin"] = pd.qcut(merged_df.index, 10, labels=False)  # 10 equal b
 
 # Scale sizes for better visualization
 merged_df["size"] = (merged_df["size_bin"] + 1) * 10 
+
+# --- ANCOVA ANALYSIS ---
+ancova_df = merged_df.copy()
+ancova_df['Log_MGE'] = np.log10(ancova_df['MGE'] + 1)
+ancova_df['Log_AMR'] = np.log10(ancova_df['AMR'] + 1)
+
+formula = 'Log_MGE ~ Log_AMR + C(study_data) + C(donor_pre_post)'
+model = smf.ols(formula, data=ancova_df).fit()
+ancova_table = sm.stats.anova_lm(model, typ=2)
+
+print("--- ANCOVA Results ---")
+print(ancova_table)
 
 fig, ax = plt.subplots(figsize=(14, 8))  # Increased figure size
 

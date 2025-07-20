@@ -57,7 +57,6 @@ run_pairwise_permanova_multi_groups <- function(distance_matrix_path, metadata_p
       as.dist(sub_mat) ~ GroupFactor,
       data = sub_meta,
       permutations = permutations,
-      #strata = sub_meta$Patient,
       method = "euclidean"
     )
     
@@ -97,11 +96,11 @@ route_mdrb_mob <- run_pairwise_permanova_multi_groups(
  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_mdrb.csv",
  group_column = "fmt_route"
 )
-# route_rcdi_mob <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv",
-#   group_column = "fmt_route"
-# )
+route_rcdi_mob <- run_pairwise_permanova_multi_groups(
+ distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv",
+ metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv",
+   group_column = "fmt_route"
+)
 
 sequencer_rcdi_mob <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/aitchison_rcdi.csv",
@@ -157,16 +156,16 @@ extrac_rcdi_res <- run_pairwise_permanova_multi_groups(
 )
 
 
-# route_mdrb_res <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_mdrb.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_mdrb.csv",
-#   group_column = "fmt_route"
-# )
-# route_rcdi_res <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_rcdi.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_rcdi.csv",
-#   group_column = "fmt_route"
-# )
+route_mdrb_res <- run_pairwise_permanova_multi_groups(
+  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_mdrb.csv",
+  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_mdrb.csv",
+  group_column = "fmt_route"
+)
+route_rcdi_res <- run_pairwise_permanova_multi_groups(
+   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_rcdi.csv",
+   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_rcdi.csv",
+   group_column = "fmt_route"
+)
 
 sequencer_rcdi_res <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/aitchison_rcdi.csv",
@@ -198,11 +197,11 @@ donrec_mdrb_res <- run_pairwise_permanova_multi_groups(
   group_column = "donor_pre_post"
 )
 
-# donrec_mdrb_res <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/aitchison_melanoma.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_melanoma.csv",
-#   group_column = "donor_pre_post"
-# )
+donrec_melanoma_res <- run_pairwise_permanova_multi_groups(
+  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/aitchison_melanoma.csv",
+  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_melanoma.csv",
+  group_column = "donor_pre_post"
+)
 
 
 

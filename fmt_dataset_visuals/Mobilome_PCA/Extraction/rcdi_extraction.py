@@ -8,6 +8,8 @@ from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch
+
 
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
@@ -109,8 +111,19 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Plotting
 plt.figure(figsize=(10, 6))
 unique_kits = merged_mobilome_df['DNA_extraction_kit'].unique()
-palette = sns.color_palette('tab10', len(unique_kits))
-kit_colors = {kit: palette[i] for i, kit in enumerate(unique_kits)}
+kit_colors = {
+    'DNeasy Pro': 'red',
+    'MagCore': 'blue',
+    'PureLink mini': 'green',
+    'DNeasy': 'orange',
+    'QIAamp' : 'purple',
+    'MoBio PS': 'brown',
+    'NucleoSpin': 'yellow',
+    'MoBio MB': 'pink',
+    'Phenol': 'lightblue',
+    'Zymo': 'maroon',
+    'PureLink' : 'coral'
+}
 
 ax = sns.scatterplot(
     x='PC1', y='PC2',
@@ -118,7 +131,8 @@ ax = sns.scatterplot(
     data=merged_mobilome_df,
     palette=kit_colors,
     alpha=0.7,
-    edgecolor='k'
+    edgecolor='k',
+    legend=False # Disables the default legend
 )
 
 # Ellipses
@@ -130,7 +144,7 @@ for kit in unique_kits:
 plt.xlim(merged_mobilome_df['PC1'].min() - 150, merged_mobilome_df['PC1'].max() + 100)
 plt.ylim(merged_mobilome_df['PC2'].min() - 100, merged_mobilome_df['PC2'].max() + 100)
 
-# Adjust legend
+# Adjust plot appearance
 ax.set_xlabel('')
 ax.set_ylabel('')
 ax.set_xticks([])
@@ -140,12 +154,40 @@ ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
-legend = plt.legend()
-# plt.legend(bbox_to_anchor=(1.8, 0.5), loc='right', markerscale=5, fontsize=25)
 
-# Save plot as SVG
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
+# Create and add the custom legend
+legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
+                  for label, color in kit_colors.items()]
+
+lgd = plt.legend(
+    handles=legend_handles,
+    title='DNA Extraction Kit',
+    bbox_to_anchor=(1.8, 0.5),
+    loc='right',
+    markerscale=2,
+    fontsize=20
+)
+
+# Adjust layout to make room for the legend
+plt.subplots_adjust(right=0.6)
+
+# Save plot and show
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_rcdi.svg",
+    format='svg',
+    dpi=600,
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight',
+    transparent=True
+)
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/pca_rcdi.png",
+    format='png',
+    dpi=600,
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight',
+    transparent=True
+)
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient
