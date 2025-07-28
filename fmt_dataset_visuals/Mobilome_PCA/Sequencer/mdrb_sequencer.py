@@ -113,8 +113,15 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['sequencer'].unique()
 palette = sns.color_palette('tab10', len(unique_groups))
-group_colors = {group: palette[i] for i, group in enumerate(unique_groups)}
-
+group_colors = {
+    'Illumina 6000': 'red',
+    'NextSeq 500': 'blue',
+    'HiSeq 10': 'green',
+    'Illumina 4000': 'orange',
+    'Illumina 2500' : 'purple',
+    'Illumina 3000': 'brown',
+    'Illumina Genome': 'yellow',
+}
 ax = sns.scatterplot(x='PC1', y='PC2', hue='sequencer', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
 
 # Computing confidence ellipses
@@ -135,7 +142,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-# legend.set_visible(False)
+legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 plt.show()

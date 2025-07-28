@@ -8,6 +8,8 @@ from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch
+
 
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
@@ -117,10 +119,22 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['donor_pre_post'].unique()
-palette = sns.color_palette('tab10', len(unique_groups))
-group_colors = {group: palette[i] for i, group in enumerate(unique_groups)}
+group_colors = {
+    'Donor': '#003771',
+    'PreFMT': '#726732',
+    'PostFMT': '#b9c0e7'
+}
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
+ax = sns.scatterplot(
+    x='PC1', 
+    y='PC2', 
+    hue='donor_pre_post', 
+    data=merged_mobilome_df, 
+    palette=group_colors, 
+    alpha=0.7, 
+    edgecolor='k',
+    legend=False # Disable default legend
+)
 
 # Computing confidence ellipses
 for group in unique_groups:
@@ -139,10 +153,40 @@ ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
-legend = plt.legend()
-plt.legend(bbox_to_anchor=(1.35, 0.5), loc='right', markerscale=5, fontsize=25)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
+
+# Create and add the custom legend
+legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
+                  for label, color in group_colors.items()]
+
+lgd = plt.legend(
+    handles=legend_handles,
+    title='Sample Type',
+    bbox_to_anchor=(1.35, 0.5),
+    loc='right',
+    markerscale=2,
+    fontsize=20
+)
+
+# Adjust layout to make room for the legend
+plt.subplots_adjust(right=0.7)
+
+# Save plot and show
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_rcdi.svg", 
+    format='svg', 
+    dpi=600, 
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight', 
+    transparent=True
+)
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_rcdi.png", 
+    format='png', 
+    dpi=600, 
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight', 
+    transparent=True
+)
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

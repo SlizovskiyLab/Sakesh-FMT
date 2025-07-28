@@ -110,9 +110,21 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_mobilome_df['study_data'].unique()
-palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
-
+disease_colors = {
+    'Ianiro': 'red',
+    'Leo': 'blue',
+    'Bar Yoseph': 'green',
+    'Baruch': 'orange',
+    'Davar' : 'Purple',
+    'Smillie': 'brown',
+    'Watson': 'yellow',
+    'Kumar': 'Pink',
+    'Verma': 'lightblue',
+    'Podlesny': 'maroon',
+    'Hourigan' : 'coral',
+    'Aggarwala' : 'gray',
+    'Moss' : '#FFAA1D'
+}
 ax = sns.scatterplot(x='PC1', y='PC2', hue='study_data', data=merged_mobilome_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # Computing confidence ellipses
@@ -133,7 +145,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-# legend.set_visible(False)
+legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 

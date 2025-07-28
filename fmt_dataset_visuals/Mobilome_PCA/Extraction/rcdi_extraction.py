@@ -112,14 +112,14 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_kits = merged_mobilome_df['DNA_extraction_kit'].unique()
 kit_colors = {
-    'DNeasy Pro': 'red',
-    'MagCore': 'blue',
-    'PureLink mini': 'green',
-    'DNeasy': 'orange',
-    'QIAamp' : 'purple',
-    'MoBio PS': 'brown',
-    'NucleoSpin': 'yellow',
-    'MoBio MB': 'pink',
+    'DNeasy Pro': '#003771',
+    'MagCore': '#726732',
+    'PureLink mini': '#b9c0e7',
+    'DNeasy': '#deca76',
+    'QIAamp' : '#34301f',
+    'MoBio PS': '#3a82ff',
+    'NucleoSpin': '#ffe226',
+    'MoBio MB': '#787c93',
     'Phenol': 'lightblue',
     'Zymo': 'maroon',
     'PureLink' : 'coral'

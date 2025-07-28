@@ -8,6 +8,8 @@ from skbio.stats.composition import clr
 from sklearn.impute import KNNImputer
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch
+
 
 # File paths
 mge_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\Telcomb_MGE_analytical_matrix.xlsx - Sheet1.csv"
@@ -120,10 +122,32 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 # Creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_mobilome_df['study_data'].unique()
-palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+disease_colors = {
+    'Ianiro': '#003771',
+    'Leo': '#726732',
+    'Bar Yoseph': '#b9c0e7',
+    'Baruch': '#deca76',
+    'Davar' : '#34301f',
+    'Smillie': '#3a82ff',
+    'Watson': '#ffe226',
+    'Kumar': '#787c93',
+    'Verma': 'lightblue',
+    'Podlesny': 'maroon',
+    'Hourigan' : 'coral',
+    'Aggarwala' : 'gray',
+    'Moss' : '#FFAA1D'
+}
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='study_data', data=merged_mobilome_df, palette=disease_colors, alpha=0.7, edgecolor='k')
+ax = sns.scatterplot(
+    x='PC1', 
+    y='PC2', 
+    hue='study_data', 
+    data=merged_mobilome_df, 
+    palette=disease_colors, 
+    alpha=0.7, 
+    edgecolor='k',
+    legend=False # Disable default legend
+)
 
 # Computing confidence ellipses
 for disease in unique_diseases:
@@ -142,11 +166,40 @@ ax.spines['right'].set_visible(False)
 ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
-legend = plt.legend()
-# plt.legend(bbox_to_anchor=(1.6, 0.5), loc='right', markerscale=5, fontsize=25)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 
+# Create and add the custom legend
+legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
+                  for label, color in disease_colors.items()]
+
+lgd = plt.legend(
+    handles=legend_handles,
+    title='Study',
+    bbox_to_anchor=(1.6, 0.5),
+    loc='right',
+    markerscale=2,
+    fontsize=20
+)
+
+# Adjust layout to make room for the legend
+plt.subplots_adjust(right=0.6)
+
+# Save plot and show
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.svg", 
+    format='svg', 
+    dpi=600, 
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight', 
+    transparent=True
+)
+plt.savefig(
+    "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/pca_rcdi.png", 
+    format='png', 
+    dpi=600, 
+    bbox_extra_artists=(lgd,),
+    bbox_inches='tight', 
+    transparent=True
+)
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient

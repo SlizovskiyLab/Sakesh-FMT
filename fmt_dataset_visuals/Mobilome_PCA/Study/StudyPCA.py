@@ -97,7 +97,19 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_mobilome_df['study_data'].unique()
 palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+disease_colors = {
+    'DNeasy Pro': 'red',
+    'MagCore': 'blue',
+    'PureLink mini': 'green',
+    'DNeasy': 'orange',
+    'QIAamp' : 'Purple',
+    'MoBio PS': 'brown',
+    'NucleoSpin': 'yellow',
+    'MoBio MB': 'Pink',
+    'Phenol': 'lightblue',
+    'Zymo': 'maroon',
+    'PureLink' : 'coral'
+}
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='study_data', data=merged_mobilome_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 

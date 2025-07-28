@@ -116,7 +116,15 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['fmt_route'].unique()
 palette = sns.color_palette('tab10', len(unique_groups))
-group_colors = {group: palette[i] for i, group in enumerate(unique_groups)}
+group_colors = {
+    'Oral Capsule': 'red',
+    'Nasogastric': 'blue',
+    'Colonoscopy/Enteroscopy': 'green',
+    'Colonoscopy/Nasogastric': 'orange',
+    'Nasoduodenal' : 'purple',
+    'Colonoscopy & Capsule': 'brown',
+    'Colonoscopy': 'yellow',
+}
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_route', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
 
@@ -138,7 +146,7 @@ ax.spines['bottom'].set_visible(False)
 ax.spines['left'].set_visible(False)
 ax.grid(False)
 legend = plt.legend()
-# legend.set_visible(False)
+legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 
