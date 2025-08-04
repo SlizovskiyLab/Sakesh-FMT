@@ -25,7 +25,11 @@ fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'Melanoma']
-
+fmt_dataset['sequencer'] = fmt_dataset['sequencer'].replace({
+    'Illumina_NovaSeq_6000': 'Illumina 6000',
+    'NextSeq_500': 'NextSeq 500',
+    'HiSeq_X_Ten': 'HiSeq 10',
+})
 
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
@@ -105,7 +109,15 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_df['sequencer'].unique()
 palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+disease_colors = {
+    'Illumina 6000': '#003771',
+    'NextSeq 500': '#726732',
+    'HiSeq 10': '#b9c0e7',
+    'Illumina 4000': '#deca76',
+    'Illumina 2500' : '#34301f',
+    'Illumina 3000': '#3a82ff',
+    'Illumina Genome': '#ffe226',
+}
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='sequencer', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
@@ -117,11 +129,19 @@ for disease in unique_diseases:
 plt.xlim(merged_df['PC1'].min() - 1300, merged_df['PC1'].max() + 650)
 plt.ylim(merged_df['PC2'].min() - 300, merged_df['PC2'].max() + 50)
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='Sequencer', bbox_to_anchor=(1, 1), loc='upper right')
-plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+legend = plt.legend()
+legend.set_visible(False)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent = True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent = True)
 
 plt.show()
 

@@ -33,7 +33,9 @@ fmt_dataset = fmt_dataset.iloc[:-5]
 # Cleaning donor_pre_post column
 fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({
     'Pre-FMT': 'PreFMT', 
-    'Post-FMT': 'PostFMT'
+    'Post-FMT': 'PostFMT',
+    'Pre-Abx/FMT': 'PreFMT'
+
 })
 
 # Filtering out 'Pre-Abx/FMT'
@@ -121,8 +123,11 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_df['donor_pre_post'].unique()
 palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
-
+disease_colors = {
+    'Donor': '#003771',
+    'PreFMT': '#726732',
+    'PostFMT': '#b9c0e7'
+}
 ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # computing confidence ellipses
@@ -133,11 +138,19 @@ for disease in unique_diseases:
 plt.xlim(merged_df['PC1'].min() - 600, merged_df['PC1'].max() + 550)
 plt.ylim(merged_df['PC2'].min() - 300, merged_df['PC2'].max() + 350)
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='Donor/preFMT/postFMT', bbox_to_anchor=(1, 1), loc='upper right')
-plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+legend = plt.legend()
+legend.set_visible(False)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent = True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent = True)
 
 plt.show()
 

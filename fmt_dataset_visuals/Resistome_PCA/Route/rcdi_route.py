@@ -9,6 +9,8 @@ from sklearn.impute import KNNImputer
 from scipy.stats import sem
 from scipy.stats import chi2
 from matplotlib.patches import Ellipse
+from matplotlib.patches import Patch
+
 
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"
@@ -21,7 +23,19 @@ annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
-
+fmt_dataset['fmt_route'] = fmt_dataset['fmt_route'].replace({
+    'oral_capsule': 'Oral Capsule',
+    '30 capsules': 'Oral Capsule',
+    'Nasogastric_tube_(single)': 'Nasogastric',
+    'Nasogastric tube (single)': 'Nasogastric',
+    'Nasogastric tube, single': 'Nasogastric',
+    'Enteroscopy and colonoscopy, single': 'Colonoscopy/Enteroscopy',
+    'colonoscopy_or_nasogastric_tube': 'Colonoscopy/Nasogastric',
+    'nasoduodenal tube': 'Nasoduodenal',
+    'Colonoscopy, single, + 12 capsules every 2 weeks for 90 days': 'Colonoscopy & Capsule',
+    'colonoscopy': 'Colonoscopy',
+    'Colonoscopy, single': 'Colonoscopy',
+})
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
 
@@ -101,7 +115,15 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_df['fmt_route'].unique()
 palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
+disease_colors = {
+    'Oral Capsule': '#003771',
+    'Nasogastric': '#726732',
+    'Colonoscopy/Enteroscopy': '#b9c0e7',
+    'Colonoscopy/Nasogastric': '#deca76',
+    'Nasoduodenal' : '#34301f',
+    'Colonoscopy & Capsule': '#3a82ff',
+    'Colonoscopy': '#ffe226',
+}
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_route', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
@@ -113,11 +135,34 @@ for disease in unique_diseases:
 plt.xlim(merged_df['PC1'].min() - 900, merged_df['PC1'].max() + 850)
 plt.ylim(merged_df['PC2'].min() - 300, merged_df['PC2'].max() + 600)
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='FMT Route', bbox_to_anchor=(1, 1), loc='upper right')
-plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+
+# Create and add the custom legend
+legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
+                  for label, color in disease_colors.items()]
+
+lgd = plt.legend(
+    handles=legend_handles,
+    title='FMT Route',
+    bbox_to_anchor=(2.4, 0.5),
+    ncol = 1,
+    loc='right',
+    markerscale=2,
+    fontsize=20
+)
+
+# Adjust layout to make room for the legend
+plt.subplots_adjust(right=0.55)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent = True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent = True)
 
 plt.show()
 

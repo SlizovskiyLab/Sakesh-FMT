@@ -21,10 +21,25 @@ annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'Melanoma']
+fmt_dataset['DNA_extraction_kit'] = fmt_dataset['DNA_extraction_kit'].replace({
+    'DNeasy_PowerSoil_Pro_Kit': 'DNeasy Pro',
+    'MagCore_Genomic_DNA_Tissue_Kit_MODIFIED': 'MagCore',
+    'PureLink_Genomic_DNA_Mini_Kit': 'PureLink mini',
+    'DNeasy_PowerSoil_Kit': 'DNeasy',
+    'QIAamp_DNA_Stool_Mini_Kit': 'QIAamp',
+    'MoBio_PowerSoil': 'MoBio PS',
+    ' NucleoSpin_Soil': 'NucleoSpin',
+    'MoBio_Microbiome': 'MoBio MB',
+    'phenol_chloroform': 'Phenol',
+    'Zymo_fecal_DNA_isolation_Kit': 'Zymo',
+    'Purelink_Microbiome_DNA_purification_Kit': 'PureLink'
+})
 
 # Remove rows where 'Patient' is missing or blank
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
+fmt_dataset = fmt_dataset.dropna(subset=['DNA_extraction_kit'])
+fmt_dataset = fmt_dataset[fmt_dataset['DNA_extraction_kit'].str.strip() != '']
 
 
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
@@ -107,8 +122,19 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_df['DNA_extraction_kit'].unique()
 palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {disease: palette[i] for i, disease in enumerate(unique_diseases)}
-
+disease_colors = {
+    'DNeasy Pro': '#003771',
+    'MagCore': '#726732',
+    'PureLink mini': '#b9c0e7',
+    'DNeasy': '#deca76',
+    'QIAamp' : '#34301f',
+    'MoBio PS': '#3a82ff',
+    'NucleoSpin': '#ffe226',
+    'MoBio MB': '#787c93',
+    'Phenol': '#000000',
+    'Zymo': 'maroon',
+    'PureLink' : 'coral'
+}
 ax = sns.scatterplot(x='PC1', y='PC2', hue='DNA_extraction_kit', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # computing confidence ellipses
@@ -119,11 +145,19 @@ for disease in unique_diseases:
 plt.xlim(merged_df['PC1'].min() - 700, merged_df['PC1'].max() + 350)
 plt.ylim(merged_df['PC2'].min() - 100, merged_df['PC2'].max() + 500)
 
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='DNA extraction kit', bbox_to_anchor=(1, 1), loc='upper right')
-plt.grid(True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
+legend = plt.legend()
+legend.set_visible(False)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/pca_melanoma.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/pca_melanoma.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 
 plt.show()
 
