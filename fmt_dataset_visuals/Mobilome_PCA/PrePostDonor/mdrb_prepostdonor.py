@@ -117,9 +117,9 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['donor_pre_post'].unique()
 group_colors = {
-    'Donor': 'blue',
-    'PreFMT': 'red',
-    'PostFMT': 'green'
+    'Donor': '#003771',
+    'PreFMT': '#726732',
+    'PostFMT': '#b9c0e7'
 }
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')

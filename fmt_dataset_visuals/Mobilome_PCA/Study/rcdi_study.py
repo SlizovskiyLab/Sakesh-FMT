@@ -131,7 +131,7 @@ disease_colors = {
     'Smillie': '#3a82ff',
     'Watson': '#ffe226',
     'Kumar': '#787c93',
-    'Verma': 'lightblue',
+    'Verma': '#000000',
     'Podlesny': 'maroon',
     'Hourigan' : 'coral',
     'Aggarwala' : 'gray',
@@ -174,7 +174,8 @@ legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
 lgd = plt.legend(
     handles=legend_handles,
     title='Study',
-    bbox_to_anchor=(1.6, 0.5),
+    bbox_to_anchor=(2, 0.5),
+    ncol = 2,
     loc='right',
     markerscale=2,
     fontsize=20

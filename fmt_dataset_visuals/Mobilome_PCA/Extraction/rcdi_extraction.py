@@ -120,7 +120,7 @@ kit_colors = {
     'MoBio PS': '#3a82ff',
     'NucleoSpin': '#ffe226',
     'MoBio MB': '#787c93',
-    'Phenol': 'lightblue',
+    'Phenol': '#000000',
     'Zymo': 'maroon',
     'PureLink' : 'coral'
 }
@@ -162,7 +162,8 @@ legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
 lgd = plt.legend(
     handles=legend_handles,
     title='DNA Extraction Kit',
-    bbox_to_anchor=(1.8, 0.5),
+    bbox_to_anchor=(2.2, 0.5),
+    ncol=2,  
     loc='right',
     markerscale=2,
     fontsize=20

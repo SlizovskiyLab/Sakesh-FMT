@@ -111,20 +111,21 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_diseases = merged_mobilome_df['study_data'].unique()
 disease_colors = {
-    'Ianiro': 'red',
-    'Leo': 'blue',
-    'Bar Yoseph': 'green',
-    'Baruch': 'orange',
-    'Davar' : 'Purple',
-    'Smillie': 'brown',
-    'Watson': 'yellow',
-    'Kumar': 'Pink',
-    'Verma': 'lightblue',
+    'Ianiro': '#003771',
+    'Leo': '#726732',
+    'Bar Yoseph': '#b9c0e7',
+    'Baruch': '#deca76',
+    'Davar' : '#34301f',
+    'Smillie': '#3a82ff',
+    'Watson': '#ffe226',
+    'Kumar': '#787c93',
+    'Verma': '#000000',
     'Podlesny': 'maroon',
     'Hourigan' : 'coral',
     'Aggarwala' : 'gray',
     'Moss' : '#FFAA1D'
 }
+
 ax = sns.scatterplot(x='PC1', y='PC2', hue='study_data', data=merged_mobilome_df, palette=disease_colors, alpha=0.7, edgecolor='k')
 
 # Computing confidence ellipses

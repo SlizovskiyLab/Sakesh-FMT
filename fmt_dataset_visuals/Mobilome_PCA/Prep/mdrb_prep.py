@@ -109,8 +109,8 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['fmt_prep'].unique()
 group_colors = {
-    'fresh': 'blue',
-    'frozen': 'red'
+    'fresh': '#003771',
+    'frozen': '#726732'
 }
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_prep', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k', s=50)
@@ -122,11 +122,19 @@ for group in unique_groups:
 plt.xlim(merged_mobilome_df['PC1'].min() - 80, merged_mobilome_df['PC1'].max() + 40)
 plt.ylim(merged_mobilome_df['PC2'].min() - 50, merged_mobilome_df['PC2'].max() + 30)
 
-plt.xlabel('Principal Component 1', fontsize=25, fontweight='bold')
-plt.ylabel('Principal Component 2', fontsize=25, fontweight='bold')
+ax.set_xlabel('')
+ax.set_ylabel('')
+ax.set_xticks([])
+ax.set_yticks([])
+ax.spines['top'].set_visible(False)
+ax.spines['right'].set_visible(False)
+ax.spines['bottom'].set_visible(False)
+ax.spines['left'].set_visible(False)
+ax.grid(False)
 legend = plt.legend()
 legend.set_visible(False)
-plt.grid(True)
+legend = plt.legend()
+legend.set_visible(False)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.svg", format='svg', dpi=600, bbox_inches='tight', transparent=True)
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Prep/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 plt.show()

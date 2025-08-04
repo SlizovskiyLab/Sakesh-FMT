@@ -117,13 +117,13 @@ plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['fmt_route'].unique()
 palette = sns.color_palette('tab10', len(unique_groups))
 group_colors = {
-    'Oral Capsule': 'red',
-    'Nasogastric': 'blue',
-    'Colonoscopy/Enteroscopy': 'green',
-    'Colonoscopy/Nasogastric': 'orange',
-    'Nasoduodenal' : 'purple',
-    'Colonoscopy & Capsule': 'brown',
-    'Colonoscopy': 'yellow',
+    'Oral Capsule': '#003771',
+    'Nasogastric': '#726732',
+    'Colonoscopy/Enteroscopy': '#b9c0e7',
+    'Colonoscopy/Nasogastric': '#deca76',
+    'Nasoduodenal' : '#34301f',
+    'Colonoscopy & Capsule': '#3a82ff',
+    'Colonoscopy': '#ffe226',
 }
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='fmt_route', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')

@@ -111,8 +111,8 @@ plt.figure(figsize=(8, 6))
 ax = plt.gca()
 unique_groups = merged_mobilome_df['fmt_prep'].unique()
 group_colors = {
-    'fresh': 'blue',
-    'frozen': 'red'
+    'fresh': '#003771',
+    'frozen': '#726732'
 }
 
 ax = sns.scatterplot(

@@ -161,7 +161,7 @@ legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
 lgd = plt.legend(
     handles=legend_handles,
     title='Sample Type',
-    bbox_to_anchor=(1.35, 0.5),
+    bbox_to_anchor=(1.5, 0.5),
     loc='right',
     markerscale=2,
     fontsize=20

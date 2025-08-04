@@ -170,7 +170,8 @@ legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
 lgd = plt.legend(
     handles=legend_handles,
     title='FMT Route',
-    bbox_to_anchor=(1.7, 0.5),
+    bbox_to_anchor=(1.9, 0.5),
+    ncol = 1,
     loc='right',
     markerscale=2,
     fontsize=20

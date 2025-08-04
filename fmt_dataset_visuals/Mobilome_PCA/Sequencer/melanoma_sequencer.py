@@ -115,13 +115,13 @@ plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['sequencer'].unique()
 palette = sns.color_palette('tab10', len(unique_groups))
 group_colors = {
-    'Illumina 6000': 'red',
-    'NextSeq 500': 'blue',
-    'HiSeq 10': 'green',
-    'Illumina 4000': 'orange',
-    'Illumina 2500' : 'purple',
-    'Illumina 3000': 'brown',
-    'Illumina Genome': 'yellow',
+    'Illumina 6000': '#003771',
+    'NextSeq 500': '#726732',
+    'HiSeq 10': '#b9c0e7',
+    'Illumina 4000': '#deca76',
+    'Illumina 2500' : '#34301f',
+    'Illumina 3000': '#3a82ff',
+    'Illumina Genome': '#ffe226',
 }
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='sequencer', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
