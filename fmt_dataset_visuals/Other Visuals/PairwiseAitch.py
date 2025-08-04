@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.decomposition import PCA
+from scipy.spatial.distance import pdist, squareform
+from skbio.stats.composition import clr
+from sklearn.impute import KNNImputer
+from scipy.stats import sem
+from scipy.stats import chi2
+from matplotlib.patches import Ellipse
 
 def process_disease_data(df_full, aitchison_file_path, disease_type_name):
     """
@@ -21,7 +28,7 @@ def process_disease_data(df_full, aitchison_file_path, disease_type_name):
         print(f"Successfully loaded Aitchison matrix: {aitchison_file_path}")
     except FileNotFoundError:
         print(f"Error: Aitchison file not found at '{aitchison_file_path}'. Skipping this disease.")
-        return pd.DataFrame() # Return empty DataFrame if file is missing
+        return pd.DataFrame()
 
     # --- Step 1: Filter and clean the metadata DataFrame ---
     df_filtered = df_full[df_full['Disease_type'] == disease_type_name].copy()
@@ -81,7 +88,6 @@ def process_disease_data(df_full, aitchison_file_path, disease_type_name):
 
 # --- Step 0: Define File Paths ---
 metadata_file = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
-# A dictionary mapping disease types to their respective Aitchison distance files
 disease_files = {
     'rCDI': "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_rcdi.csv",
     'Melanoma': "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_melanoma.csv",
@@ -116,26 +122,148 @@ print("\nGenerating stacked violin plots...")
 processed_diseases = final_plot_df['Disease Type'].unique()
 num_diseases = len(processed_diseases)
 
-fig, axes = plt.subplots(num_diseases, 1, figsize=(12, 6 * num_diseases), sharex=True, sharey=True)
-if num_diseases == 1: # If only one plot, axes is not a list
+fig, axes = plt.subplots(num_diseases, 1, figsize=(12, 6 * num_diseases), sharex=True)
+fig.suptitle('Resistome-Donor Distance by Disease', fontsize=18, y=0.95)
+if num_diseases == 1:
     axes = [axes]
 
 bin_order = ['0', '1-30', '31-60', '>60']
+palette = sns.color_palette("viridis", n_colors=len(bin_order))
+
+# Calculate medians for plotting points
+medians_df = final_plot_df.groupby(['Disease Type', 'Timepoint Bin'])['Aitchison Distance'].median().reset_index()
 
 for i, disease_name in enumerate(processed_diseases):
     ax = axes[i]
     disease_data = final_plot_df[final_plot_df['Disease Type'] == disease_name]
     
-    sns.violinplot(x='Timepoint Bin', y='Aitchison Distance', data=disease_data, order=bin_order, ax=ax, palette='viridis')
+    # --- Aesthetic Changes ---
+    sns.violinplot(x='Timepoint Bin', y='Aitchison Distance', hue='Timepoint Bin', data=disease_data, order=bin_order, ax=ax, 
+                   palette=palette, inner=None, linewidth=2, legend=False)
     
-    ax.set_title(f'Distribution of Aitchison Distances for {disease_name}', fontsize=16)
-    ax.set_ylabel('Aitchison Distance to Donor', fontsize=12)
-    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    sns.boxplot(x='Timepoint Bin', y='Aitchison Distance', data=disease_data, order=bin_order, ax=ax, 
+                color="white", width=0.2, boxprops={'zorder': 2},
+                medianprops={'visible': False})
+                
+    sns.stripplot(x='Timepoint Bin', y='Aitchison Distance', data=disease_data, order=bin_order, ax=ax, 
+                  color="black", alpha=0.3, jitter=True)
+    
+    # Plot a horizontal line for the median
+    current_medians = medians_df[medians_df['Disease Type'] == disease_name]
+    sns.scatterplot(x='Timepoint Bin', y='Aitchison Distance', data=current_medians, ax=ax,
+                    color='black', s=600, marker='_', zorder=3, legend=False)
+
+    for violin in ax.collections[:len(bin_order)]:
+        for path in violin.get_paths():
+            vertices = path.vertices
+            vertices[:, 1] = np.maximum(0, vertices[:, 1])
+    
+    ax.set_title(f'Distribution of Aitchison Distances for {disease_name}', fontsize=11)
+    
+    if i == num_diseases // 2:
+        ax.set_ylabel('Aitchison Distance to Donor', fontsize=12)
+    else:
+        ax.set_ylabel('')
+    
+    ax.grid(False)
+    ax.set_ylim(bottom=0) 
 
 # Set common X-axis label
 axes[-1].set_xlabel('Timepoint Bin (Days Post-FMT)', fontsize=12)
 plt.xticks(rotation=45)
 
-plt.tight_layout()
+# Adjust vertical spacing between plots and remove tight_layout
+# plt.subplots_adjust(hspace=0.4)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/resistome_pairwise_aichison.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
+
 plt.show()
 
+# --- START: Code for Mobilome Sister Figure ---
+
+print("\n\n" + "="*50)
+print("Generating Sister Figure for Mobilome Data")
+print("="*50)
+
+
+# --- Step 1: Define New File Paths for Mobilome ---
+mobilome_disease_files = {
+    'rCDI': "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_rcdi.csv",
+    'Melanoma': "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_melanoma.csv",
+    'MDRB': "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_mdrb.csv"
+}
+
+# --- Step 2: Process each disease for Mobilome data ---
+all_mobilome_plot_data = []
+for disease, aitchison_file in mobilome_disease_files.items():
+    disease_df = process_disease_data(df_full_metadata, aitchison_file, disease)
+    if not disease_df.empty:
+        all_mobilome_plot_data.append(disease_df)
+
+# Combine all mobilome data into a single DataFrame
+if not all_mobilome_plot_data:
+    print("\nNo Mobilome data was processed successfully. Exiting.")
+    exit()
+
+final_mobilome_plot_df = pd.concat(all_mobilome_plot_data, ignore_index=True)
+
+# --- Step 3: Create Stacked Violin Plots for Mobilome ---
+print("\nGenerating stacked violin plots for Mobilome...")
+
+# Get the list of diseases that were successfully processed
+processed_mobilome_diseases = final_mobilome_plot_df['Disease Type'].unique()
+num_mobilome_diseases = len(processed_mobilome_diseases)
+
+fig_mobilome, axes_mobilome = plt.subplots(num_mobilome_diseases, 1, figsize=(12, 6 * num_mobilome_diseases), sharex=True)
+fig_mobilome.suptitle('Mobilome-Donor Distance by Disease', fontsize=18, y=0.95)
+
+if num_mobilome_diseases == 1:
+    axes_mobilome = [axes_mobilome]
+
+# Re-calculate medians for the new dataset
+medians_mobilome_df = final_mobilome_plot_df.groupby(['Disease Type', 'Timepoint Bin'])['Aitchison Distance'].median().reset_index()
+
+for i, disease_name in enumerate(processed_mobilome_diseases):
+    ax = axes_mobilome[i]
+    disease_data = final_mobilome_plot_df[final_mobilome_plot_df['Disease Type'] == disease_name]
+    
+    # Apply aesthetics
+    sns.violinplot(x='Timepoint Bin', y='Aitchison Distance', hue='Timepoint Bin', data=disease_data, order=bin_order, ax=ax, 
+                   palette=palette, inner=None, linewidth=2, legend=False)
+    
+    sns.boxplot(x='Timepoint Bin', y='Aitchison Distance', data=disease_data, order=bin_order, ax=ax, 
+                color="white", width=0.2, boxprops={'zorder': 2},
+                medianprops={'visible': False})
+                
+    sns.stripplot(x='Timepoint Bin', y='Aitchison Distance', data=disease_data, order=bin_order, ax=ax, 
+                  color="black", alpha=0.3, jitter=True)
+    
+    # Plot a horizontal line for the median
+    current_medians = medians_mobilome_df[medians_mobilome_df['Disease Type'] == disease_name]
+    sns.scatterplot(x='Timepoint Bin', y='Aitchison Distance', data=current_medians, ax=ax,
+                    color='black', s=600, marker='_', zorder=3, legend=False)
+
+    for violin in ax.collections[:len(bin_order)]:
+        for path in violin.get_paths():
+            vertices = path.vertices
+            vertices[:, 1] = np.maximum(0, vertices[:, 1])
+    
+    ax.set_title(f'Distribution of Aitchison Distances for {disease_name} (Mobilome)', fontsize=11)
+    
+    if i == num_mobilome_diseases // 2:
+        ax.set_ylabel('Aitchison Distance to Donor', fontsize=12)
+    else:
+        ax.set_ylabel('')
+    
+    ax.grid(False)
+    ax.set_ylim(bottom=0) 
+
+# Set common X-axis label
+axes_mobilome[-1].set_xlabel('Timepoint Bin (Days Post-FMT)', fontsize=12)
+plt.xticks(rotation=45)
+
+# Adjust vertical spacing between plots
+# plt.subplots_adjust(hspace=0.4)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/mobilome_pairwise_aichison.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
+plt.show()
+
+# --- END: Code for Mobilome Sister Figure ---
