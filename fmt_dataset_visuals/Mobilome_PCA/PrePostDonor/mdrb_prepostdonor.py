@@ -39,30 +39,42 @@ fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
 # Renaming column for merging
 mge_annotations = mge_annotations.rename(columns={'IDs': 'gene_accession'})
 
-# Merging MGE matrix with annotations, keeping only the 'final_classification' column
+# Merging MGE matrix with annotations
 mge_merged = mge_matrix.merge(
     mge_annotations[['gene_accession', 'final_classification']],
     on='gene_accession',
     how='left'
 )
 
-# Aggregating by 'final_classification' (summation across samples)
+# Aggregating by 'final_classification'
 mobilome_features = mge_merged.drop(columns=['gene_accession']).groupby('final_classification').sum().T
 
-# Resetting index and renaming for merging with FMT dataset
+# Resetting index and renaming
 mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 fmt_dataset['run_accession'] = fmt_dataset['run_accession'].astype(str).str.strip()
 mobilome_features['ID'] = mobilome_features['ID'].astype(str).str.strip()
-# Merging mobilome features with donor_pre_post column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient']], 
+
+# Merging mobilome features with metadata, INCLUDING timepoint
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient', 'timepoint']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 
 merged_mobilome_df = merged_mobilome_df[merged_mobilome_df['donor_pre_post'].notna()]
 
+# Clean the timepoint column
+merged_mobilome_df['timepoint'] = pd.to_numeric(merged_mobilome_df['timepoint'], errors='coerce')
+merged_mobilome_df.dropna(subset=['timepoint'], inplace=True)
+merged_mobilome_df['timepoint'] = merged_mobilome_df['timepoint'].astype(int)
+
+# Split 'PostFMT' into time-based bins
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'].between(1, 30)), 'donor_pre_post'] = 'PostFMT (1-30d)'
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'].between(31, 60)), 'donor_pre_post'] = 'PostFMT (31-60d)'
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'] > 60), 'donor_pre_post'] = 'PostFMT (60d+)'
+
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
-imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'donor_pre_post']))
+# Make sure to drop the 'timepoint' column before imputation
+imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'donor_pre_post', 'timepoint']))
 
 # Applying CLR transformation with zero replacement
 pseudocount = 1e-6
@@ -86,21 +98,19 @@ merged_mobilome_df['PC2'] = pca_result[:, 1]
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):
     if len(x) < 2:
-        return  # Skip groups with insufficient points
+        return
 
     mean_x, mean_y = np.mean(x), np.mean(y)
-    cov = np.cov(x, y)  # Compute covariance matrix
+    cov = np.cov(x, y)
 
-    # Eigen decomposition to get ellipse parameters
     eigvals, eigvecs = np.linalg.eigh(cov)
-    order = np.argsort(eigvals)[::-1]  # Sort eigenvalues (largest first)
+    order = np.argsort(eigvals)[::-1]
     eigvals, eigvecs = eigvals[order], eigvecs[:, order]
 
-    # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
-    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))
     width, height = 2 * chi2_val * np.sqrt(eigvals)
 
-    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))
 
     ellipse = Ellipse(
         xy=(mean_x, mean_y),
@@ -117,9 +127,11 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['donor_pre_post'].unique()
 group_colors = {
-    'Donor': '#003771',
+    'Donor': '#34301f',
     'PreFMT': '#726732',
-    'PostFMT': '#b9c0e7'
+    'PostFMT (1-30d)': '#b3cde0', # Light Blue
+    'PostFMT (31-60d)': '#6497b1', # Medium Blue
+    'PostFMT (60d+)': '#005b96', # Dark Blue
 }
 
 ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_mobilome_df, palette=group_colors, alpha=0.7, edgecolor='k')
@@ -147,8 +159,8 @@ plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDo
 plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/pca_mdrb.png", format='png', dpi=600, bbox_inches='tight', transparent=True)
 plt.show()
 
-# Save metadata: ID, fmt_prep, Patient
-metadata_df = merged_mobilome_df[['ID', 'donor_pre_post', 'Patient']]
+# Save metadata
+metadata_df = merged_mobilome_df[['ID', 'donor_pre_post', 'Patient', 'timepoint']]
 metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_mdrb.csv", index=False)
 
 # Save Aitchison distance matrix

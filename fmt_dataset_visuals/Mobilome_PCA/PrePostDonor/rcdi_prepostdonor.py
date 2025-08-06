@@ -57,15 +57,30 @@ mobilome_features.reset_index(inplace=True)
 mobilome_features.rename(columns={'index': 'ID'}, inplace=True)
 fmt_dataset['run_accession'] = fmt_dataset['run_accession'].astype(str).str.strip()
 mobilome_features['ID'] = mobilome_features['ID'].astype(str).str.strip()
-# Merging mobilome features with donor_pre_post column
-merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient']], 
+
+# --- START: MODIFIED SECTION ---
+
+# Merging mobilome features with metadata, INCLUDING timepoint
+merged_mobilome_df = mobilome_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient', 'timepoint']], 
                                              left_on='ID', right_on='run_accession', how='left').drop(columns=['run_accession'])
 merged_mobilome_df = merged_mobilome_df.dropna(subset=['donor_pre_post', 'Patient'])
 
+# Clean the timepoint column
+merged_mobilome_df['timepoint'] = pd.to_numeric(merged_mobilome_df['timepoint'], errors='coerce')
+merged_mobilome_df.dropna(subset=['timepoint'], inplace=True)
+merged_mobilome_df['timepoint'] = merged_mobilome_df['timepoint'].astype(int)
+
+# Split 'PostFMT' into time-based bins
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'].between(1, 30)), 'donor_pre_post'] = 'PostFMT (1-30d)'
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'].between(31, 60)), 'donor_pre_post'] = 'PostFMT (31-60d)'
+merged_mobilome_df.loc[(merged_mobilome_df['donor_pre_post'] == 'PostFMT') & (merged_mobilome_df['timepoint'] > 60), 'donor_pre_post'] = 'PostFMT (60d+)'
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
-imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'donor_pre_post']))
+# Drop timepoint before imputation
+imputed_data = imputer.fit_transform(merged_mobilome_df.drop(columns=['ID', 'donor_pre_post', 'timepoint']))
+
+# --- END: MODIFIED SECTION ---
 
 # Applying CLR transformation with zero replacement
 pseudocount = 1e-6
@@ -120,9 +135,11 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 plt.figure(figsize=(10, 6))
 unique_groups = merged_mobilome_df['donor_pre_post'].unique()
 group_colors = {
-    'Donor': '#003771',
+    'Donor': '#34301f',
     'PreFMT': '#726732',
-    'PostFMT': '#b9c0e7'
+    'PostFMT (1-30d)': '#b3cde0', # Light Blue
+    'PostFMT (31-60d)': '#6497b1', # Medium Blue
+    'PostFMT (60d+)': '#005b96', # Dark Blue
 }
 
 ax = sns.scatterplot(
@@ -161,7 +178,7 @@ legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
 lgd = plt.legend(
     handles=legend_handles,
     title='Sample Type',
-    bbox_to_anchor=(1.5, 0.5),
+    bbox_to_anchor=(1.7, 0.5),
     loc='right',
     markerscale=2,
     fontsize=20
@@ -190,7 +207,7 @@ plt.savefig(
 plt.show()
 
 # Save metadata: ID, fmt_prep, Patient
-metadata_df = merged_mobilome_df[['ID', 'donor_pre_post', 'Patient']]
+metadata_df = merged_mobilome_df[['ID', 'donor_pre_post', 'Patient', 'timepoint']]
 metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_rcdi.csv", index=False)
 
 # Save Aitchison distance matrix

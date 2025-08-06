@@ -36,11 +36,7 @@ fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({
     'Post-FMT': 'PostFMT',
     'Pre-Abx/FMT': 'PreFMT'
 })
-
-# Filtering out 'Pre-Abx/FMT'
-fmt_dataset = fmt_dataset[fmt_dataset['donor_pre_post'] != 'Pre-Abx/FMT']
-
-# Drop any NaN values in donor_pre_post before merging
+fmt_dataset = fmt_dataset[fmt_dataset['donor_pre_post'].isin(['PostFMT', 'PreFMT', 'Donor'])]
 fmt_dataset = fmt_dataset.dropna(subset=['donor_pre_post'])
 
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
@@ -54,20 +50,29 @@ resistance_features = amr_merged.drop(columns=['gene_accession', 'group']).group
 resistance_features.reset_index(inplace=True)
 resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 
-# Merging with donor_pre_post labels
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient']], left_on='ID', right_on='run_accession', how='left')
-merged_df.drop(columns=['run_accession'], inplace=True)
+# --- START: MODIFIED SECTION ---
 
-# Drop remaining NaN values in donor_pre_post
+# Merging with metadata, INCLUDING timepoint
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient', 'timepoint']], left_on='ID', right_on='run_accession', how='left')
+merged_df.drop(columns=['run_accession'], inplace=True)
 merged_df = merged_df.dropna(subset=['donor_pre_post'])
 
-# Keep only valid categories
-valid_categories = {'PreFMT', 'PostFMT', 'Donor'}
-merged_df = merged_df[merged_df['donor_pre_post'].isin(valid_categories)]
+# Clean the timepoint column
+merged_df['timepoint'] = pd.to_numeric(merged_df['timepoint'], errors='coerce')
+merged_df.dropna(subset=['timepoint'], inplace=True)
+merged_df['timepoint'] = merged_df['timepoint'].astype(int)
+
+# Split 'PostFMT' into time-based bins
+merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'].between(1, 30)), 'donor_pre_post'] = 'PostFMT (1-30d)'
+merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'].between(31, 60)), 'donor_pre_post'] = 'PostFMT (31-60d)'
+merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'] > 60), 'donor_pre_post'] = 'PostFMT (60d+)'
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
-imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'donor_pre_post']))
+# Drop timepoint before imputation
+imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'donor_pre_post', 'timepoint']))
+
+# --- END: MODIFIED SECTION ---
 
 # Applying CLR transformation with zero replacement
 pseudocount = 1e-6
@@ -91,21 +96,19 @@ merged_df['PC2'] = pca_result[:, 1]
 # Function to compute and draw 95% confidence ellipses
 def confidence_ellipse(x, y, ax, color, n_std=1.96):
     if len(x) < 2:
-        return  # Skip groups with insufficient points
+        return
 
     mean_x, mean_y = np.mean(x), np.mean(y)
-    cov = np.cov(x, y)  # Compute covariance matrix
+    cov = np.cov(x, y)
 
-    # Eigen decomposition to get ellipse parameters
     eigvals, eigvecs = np.linalg.eigh(cov)
-    order = np.argsort(eigvals)[::-1]  # Sort eigenvalues (largest first)
+    order = np.argsort(eigvals)[::-1]
     eigvals, eigvecs = eigvals[order], eigvecs[:, order]
 
-    # Compute width and height of the ellipse (scaled by chi2 for 95% CI)
-    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))  # Scaling factor for 95% confidence
+    chi2_val = np.sqrt(chi2.ppf(0.95, df=2))
     width, height = 2 * chi2_val * np.sqrt(eigvals)
 
-    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))  # Compute rotation angle
+    angle = np.degrees(np.arctan2(*eigvecs[:, 0][::-1]))
 
     ellipse = Ellipse(
         xy=(mean_x, mean_y),
@@ -120,22 +123,23 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 
 # creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
-unique_diseases = merged_df['donor_pre_post'].unique()
-palette = sns.color_palette('tab10', len(unique_diseases))
-disease_colors = {
-    'Donor': '#003771',
+unique_groups = merged_df['donor_pre_post'].unique()
+group_colors = {
+    'Donor': '#34301f',
     'PreFMT': '#726732',
-    'PostFMT': '#b9c0e7'
+    'PostFMT (1-30d)': '#b3cde0', # Light Blue
+    'PostFMT (31-60d)': '#6497b1', # Medium Blue
+    'PostFMT (60d+)': '#005b96', # Dark Blue
 }
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_df, palette=disease_colors, alpha=0.7, edgecolor='k')
+ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_df, palette=group_colors, alpha=0.7, edgecolor='k', legend=False)
 
 # computing confidence ellipses
-for disease in unique_diseases:
-    subset = merged_df[merged_df['donor_pre_post'] == disease]
-    confidence_ellipse(subset['PC1'], subset['PC2'], ax, disease_colors.get(disease, 'gray'))
+for group in unique_groups:
+    subset = merged_df[merged_df['donor_pre_post'] == group]
+    confidence_ellipse(subset['PC1'], subset['PC2'], ax, group_colors.get(group, 'gray'))
 
-plt.xlim(merged_df['PC1'].min() - 700, merged_df['PC1'].max() + 750)
+plt.xlim(merged_df['PC1'].min() - 1000, merged_df['PC1'].max() + 750)
 plt.ylim(merged_df['PC2'].min() - 300, merged_df['PC2'].max() + 500)
 
 ax.set_xlabel('')
@@ -150,12 +154,12 @@ ax.grid(False)
 
 # Create and add the custom legend
 legend_handles = [Patch(facecolor=color, edgecolor='k', label=label)
-                  for label, color in disease_colors.items()]
+                  for label, color in group_colors.items()]
 
 lgd = plt.legend(
     handles=legend_handles,
     title='Sample Type',
-    bbox_to_anchor=(1.5, 0.5),
+    bbox_to_anchor=(1.8, 0.5),
     loc='right',
     markerscale=2,
     fontsize=20
@@ -164,13 +168,13 @@ lgd = plt.legend(
 # Adjust layout to make room for the legend
 plt.subplots_adjust(right=0.7)
 
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_rcdi.svg", format='svg', dpi=600, bbox_inches='tight', transparent = True)
-plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_rcdi.png", format='png', dpi=600, bbox_inches='tight', transparent = True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_rcdi.svg", format='svg', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight', transparent = True)
+plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/pca_rcdi.png", format='png', dpi=600, bbox_extra_artists=(lgd,), bbox_inches='tight', transparent = True)
 
 plt.show()
 
-# Save metadata: ID, fmt_prep, Patient
-metadata_df = merged_df[['ID', 'donor_pre_post', 'Patient']]
+# Save metadata
+metadata_df = merged_df[['ID', 'donor_pre_post', 'Patient', 'timepoint']]
 metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_rcdi.csv", index=False)
 
 # Save Aitchison distance matrix
