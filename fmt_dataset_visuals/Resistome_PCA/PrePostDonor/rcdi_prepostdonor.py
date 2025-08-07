@@ -14,30 +14,20 @@ from matplotlib.patches import Patch
 # File paths
 amr_matrix_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\dedup_AMR_analytic_matrix.csv"
 annotations_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\megares_annotations_v3.00.csv"
-fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired.csv"
+# --- Use the new binned dataset ---
+fmt_dataset_path = "C:\\Users\\asake\\OneDrive\\Desktop\\Homework\\FMT\\FMT_full_dataset_paired_binned.csv"
 
 # Loading datasets
 amr_matrix = pd.read_csv(amr_matrix_path)
 annotations = pd.read_csv(annotations_path)
 fmt_dataset = pd.read_csv(fmt_dataset_path)
 
-# Remove rows where 'Patient' is missing or blank
+# Filter for disease and clean data
 fmt_dataset = fmt_dataset.dropna(subset=['Patient'])
 fmt_dataset = fmt_dataset[fmt_dataset['Patient'].astype(str).str.strip() != '']
-
 fmt_dataset = fmt_dataset[fmt_dataset['Disease_type'] == 'rCDI']
-
-# Ignoring bottom five rows
 fmt_dataset = fmt_dataset.iloc[:-5]
-
-# Cleaning donor_pre_post column
-fmt_dataset['donor_pre_post'] = fmt_dataset['donor_pre_post'].replace({
-    'Pre-FMT': 'PreFMT', 
-    'Post-FMT': 'PostFMT',
-    'Pre-Abx/FMT': 'PreFMT'
-})
-fmt_dataset = fmt_dataset[fmt_dataset['donor_pre_post'].isin(['PostFMT', 'PreFMT', 'Donor'])]
-fmt_dataset = fmt_dataset.dropna(subset=['donor_pre_post'])
+fmt_dataset = fmt_dataset.dropna(subset=['donor_pre_post_binned'])
 
 # Removing rows where 'gene_accession' contains "RequiresSNPConfirmation"
 amr_matrix_filtered = amr_matrix[~amr_matrix['gene_accession'].str.contains("RequiresSNPConfirmation", na=False)]
@@ -50,29 +40,16 @@ resistance_features = amr_merged.drop(columns=['gene_accession', 'group']).group
 resistance_features.reset_index(inplace=True)
 resistance_features.rename(columns={'index': 'ID'}, inplace=True)
 
-# --- START: MODIFIED SECTION ---
-
-# Merging with metadata, INCLUDING timepoint
-merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'donor_pre_post', 'Patient', 'timepoint']], left_on='ID', right_on='run_accession', how='left')
+# --- SIMPLIFIED MERGE ---
+# Merge directly with the new 'donor_pre_post_binned' column
+merged_df = resistance_features.merge(fmt_dataset[['run_accession', 'donor_pre_post_binned', 'Patient']], left_on='ID', right_on='run_accession', how='left')
 merged_df.drop(columns=['run_accession'], inplace=True)
-merged_df = merged_df.dropna(subset=['donor_pre_post'])
-
-# Clean the timepoint column
-merged_df['timepoint'] = pd.to_numeric(merged_df['timepoint'], errors='coerce')
-merged_df.dropna(subset=['timepoint'], inplace=True)
-merged_df['timepoint'] = merged_df['timepoint'].astype(int)
-
-# Split 'PostFMT' into time-based bins
-merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'].between(1, 30)), 'donor_pre_post'] = 'PostFMT (1-30d)'
-merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'].between(31, 60)), 'donor_pre_post'] = 'PostFMT (31-60d)'
-merged_df.loc[(merged_df['donor_pre_post'] == 'PostFMT') & (merged_df['timepoint'] > 60), 'donor_pre_post'] = 'PostFMT (60d+)'
+merged_df = merged_df.dropna(subset=['donor_pre_post_binned'])
 
 # Applying Bayesian Missing Data Imputation
 imputer = KNNImputer(n_neighbors=5)
-# Drop timepoint before imputation
-imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'donor_pre_post', 'timepoint']))
-
-# --- END: MODIFIED SECTION ---
+# Use the new binned column for imputation
+imputed_data = imputer.fit_transform(merged_df.drop(columns=['ID', 'donor_pre_post_binned']))
 
 # Applying CLR transformation with zero replacement
 pseudocount = 1e-6
@@ -123,23 +100,23 @@ def confidence_ellipse(x, y, ax, color, n_std=1.96):
 
 # creating scatter plot and explicitly setting color palette
 plt.figure(figsize=(10, 6))
-unique_groups = merged_df['donor_pre_post'].unique()
+unique_groups = merged_df['donor_pre_post_binned'].unique()
 group_colors = {
-    'Donor': '#34301f',
+    'Donor': '#003771',
     'PreFMT': '#726732',
     'PostFMT (1-30d)': '#b3cde0', # Light Blue
     'PostFMT (31-60d)': '#6497b1', # Medium Blue
     'PostFMT (60d+)': '#005b96', # Dark Blue
 }
 
-ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post', data=merged_df, palette=group_colors, alpha=0.7, edgecolor='k', legend=False)
+ax = sns.scatterplot(x='PC1', y='PC2', hue='donor_pre_post_binned', data=merged_df, palette=group_colors, alpha=0.7, edgecolor='k', legend=False)
 
 # computing confidence ellipses
 for group in unique_groups:
-    subset = merged_df[merged_df['donor_pre_post'] == group]
+    subset = merged_df[merged_df['donor_pre_post_binned'] == group]
     confidence_ellipse(subset['PC1'], subset['PC2'], ax, group_colors.get(group, 'gray'))
 
-plt.xlim(merged_df['PC1'].min() - 1000, merged_df['PC1'].max() + 750)
+plt.xlim(merged_df['PC1'].min() - 700, merged_df['PC1'].max() + 750)
 plt.ylim(merged_df['PC2'].min() - 300, merged_df['PC2'].max() + 500)
 
 ax.set_xlabel('')
@@ -173,8 +150,8 @@ plt.savefig("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostD
 
 plt.show()
 
-# Save metadata
-metadata_df = merged_df[['ID', 'donor_pre_post', 'Patient', 'timepoint']]
+# Save metadata with the correct column
+metadata_df = merged_df[['ID', 'donor_pre_post_binned', 'Patient']]
 metadata_df.to_csv("C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_rcdi.csv", index=False)
 
 # Save Aitchison distance matrix

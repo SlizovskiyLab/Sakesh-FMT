@@ -78,129 +78,129 @@ run_pairwise_permanova_multi_groups <- function(distance_matrix_path, metadata_p
 
 
 
-extrac_mdrb_mob <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_mdrb.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata_mdrb.csv",
-  group_column = "DNA_extraction_kit"
-)
-
-extrac_rcdi_mob <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata_rcdi.csv",
-  group_column = "DNA_extraction_kit"
-)
-
- 
-route_mdrb_mob <- run_pairwise_permanova_multi_groups(
- distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_mdrb.csv",
- metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_mdrb.csv",
- group_column = "fmt_route"
-)
-route_rcdi_mob <- run_pairwise_permanova_multi_groups(
- distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv",
- metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv",
-   group_column = "fmt_route"
-)
-
-sequencer_rcdi_mob <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/metadata_rcdi.csv",
-  group_column = "sequencer"
-)
-
-study_mdrb_mob <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_mdrb.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/metadata_mdrb.csv",
-  group_column = "study_data"
-)
-
-study_rcdi_mob <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/metadata_rcdi.csv",
-  group_column = "study_data"
-)
+# extrac_mdrb_mob <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_mdrb.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata_mdrb.csv",
+#   group_column = "DNA_extraction_kit"
+# )
+# 
+# extrac_rcdi_mob <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Extraction/metadata_rcdi.csv",
+#   group_column = "DNA_extraction_kit"
+# )
+# 
+#  
+# route_mdrb_mob <- run_pairwise_permanova_multi_groups(
+#  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_mdrb.csv",
+#  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_mdrb.csv",
+#  group_column = "fmt_route"
+# )
+# route_rcdi_mob <- run_pairwise_permanova_multi_groups(
+#  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/aitchison_rcdi.csv",
+#  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Route/metadata_rcdi.csv",
+#    group_column = "fmt_route"
+# )
+# 
+# sequencer_rcdi_mob <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Sequencer/metadata_rcdi.csv",
+#   group_column = "sequencer"
+# )
+# 
+# study_mdrb_mob <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_mdrb.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/metadata_mdrb.csv",
+#   group_column = "study_data"
+# )
+# 
+# study_rcdi_mob <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/Study/metadata_rcdi.csv",
+#   group_column = "study_data"
+# )
 
 
 donrec_rcdi_mob <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/aitchison_rcdi.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_rcdi.csv",
-  group_column = "donor_pre_post"
+  group_column = "donor_pre_post_binned"
 )
 donrec_mdrb_mob <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/aitchison_mdrb.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_mdrb.csv",
-  group_column = "donor_pre_post"
+  group_column = "donor_pre_post_binned"
 )
 
-# donrec_mdrb_melanoma <- run_pairwise_permanova_multi_groups(
-#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/aitchison_melanoma.csv",
-#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_melanoma.csv",
-#   group_column = "donor_pre_post"
+donrec_mdrb_melanoma <- run_pairwise_permanova_multi_groups(
+  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/aitchison_melanoma.csv",
+  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Mobilome_PCA/PrePostDonor/metadata_melanoma.csv",
+  group_column = "donor_pre_post_binned"
+)
+
+
+
+
+
+
+# extrac_mdrb_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/aitchison_mdrb.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/metadata_mdrb.csv",
+#   group_column = "DNA_extraction_kit"
 # )
-
-
-
-
-
-
-extrac_mdrb_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/aitchison_mdrb.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/metadata_mdrb.csv",
-  group_column = "DNA_extraction_kit"
-)
-
-extrac_rcdi_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/metadata_rcdi.csv",
-  group_column = "DNA_extraction_kit"
-)
-
-
-route_mdrb_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_mdrb.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_mdrb.csv",
-  group_column = "fmt_route"
-)
-route_rcdi_res <- run_pairwise_permanova_multi_groups(
-   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_rcdi.csv",
-   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_rcdi.csv",
-   group_column = "fmt_route"
-)
-
-sequencer_rcdi_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/metadata_rcdi.csv",
-  group_column = "sequencer"
-)
-
-study_mdrb_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_mdrb.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/metadata_mdrb.csv",
-  group_column = "study_data"
-)
-
-study_rcdi_res <- run_pairwise_permanova_multi_groups(
-  distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_rcdi.csv",
-  metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/metadata_rcdi.csv",
-  group_column = "study_data"
-)
+# 
+# extrac_rcdi_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Extraction/metadata_rcdi.csv",
+#   group_column = "DNA_extraction_kit"
+# )
+# 
+# 
+# route_mdrb_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_mdrb.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_mdrb.csv",
+#   group_column = "fmt_route"
+# )
+# route_rcdi_res <- run_pairwise_permanova_multi_groups(
+#    distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/aitchison_rcdi.csv",
+#    metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Route/metadata_rcdi.csv",
+#    group_column = "fmt_route"
+# )
+# 
+# sequencer_rcdi_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Sequencer/metadata_rcdi.csv",
+#   group_column = "sequencer"
+# )
+# 
+# study_mdrb_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_mdrb.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/metadata_mdrb.csv",
+#   group_column = "study_data"
+# )
+# 
+# study_rcdi_res <- run_pairwise_permanova_multi_groups(
+#   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/aitchison_rcdi.csv",
+#   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/Study/metadata_rcdi.csv",
+#   group_column = "study_data"
+# )
 
 
 donrec_rcdi_res <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/aitchison_rcdi.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_rcdi.csv",
-  group_column = "donor_pre_post"
+  group_column = "donor_pre_post_binned"
 )
 donrec_mdrb_res <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/aitchison_mdrb.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_mdrb.csv",
-  group_column = "donor_pre_post"
+  group_column = "donor_pre_post_binned"
 )
 
 donrec_melanoma_res <- run_pairwise_permanova_multi_groups(
   distance_matrix_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/aitchison_melanoma.csv",
   metadata_path = "C:/Users/asake/OneDrive/Desktop/Homework/FMT/Resistome_PCA/PrePostDonor/metadata_melanoma.csv",
-  group_column = "donor_pre_post"
+  group_column = "donor_pre_post_binned"
 )
 
 
